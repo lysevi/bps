@@ -27,6 +27,12 @@ if(NOT CMAKE_BUILD_TYPE)
         FORCE)
 endif()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cotire/CMake")
+
+include(AddCXXCompilerFlag)
+include(CompillerSettings)
+
 set(DOUBLE_CHECKS  OFF)
 if (CMAKE_BUILD_TYPE EQUAL "Debug")
     message(STATUS "debug mode")
@@ -45,11 +51,7 @@ MESSAGE(STATUS "bpstore_ENABLE_TESTS - " ${bpstore_ENABLE_TESTS})
 MESSAGE(STATUS "bpstore_ENABLE_DOUBLECHECKS - " ${bpstore_ENABLE_DOUBLECHECKS})
 MESSAGE(STATUS "bpstore_ENABLE_BENCHMARKS - " ${bpstore_ENABLE_BENCHMARKS})
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cotire/CMake")
 
-include(AddCXXCompilerFlag)
-include(CompillerSettings)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
  macro(PRECOMPILED_HEADERS ARG)
