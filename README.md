@@ -25,9 +25,6 @@
         <td>
             <a href="https://coveralls.io/github/lysevi/bps?branch=dev"><img src="https://coveralls.io/repos/github/lysevi/bps/badge.svg?branch=dev"></a>
         </td>
-        <td>
-            <a href="https://codecov.io/gh/lysevi/bps"><img src="https://codecov.io/gh/lysevi/bps/branch/dev/graph/badge.svg"></a>
-        </td>
     </tr>
 </table>
 </b>
