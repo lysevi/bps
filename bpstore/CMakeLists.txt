@@ -28,11 +28,11 @@ add_library(bpstore::bpstore ALIAS bpstore)
 
 PRECOMPILED_HEADERS(bpstore)
 
-IF(WIN32)
- SET(bpstore_NET_LIBRARIES  ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} wsock32 ws2_32 )
-else()
- SET(bpstore_NET_LIBRARIES ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} )
-endif()
+#IF(WIN32)
+# SET(bpstore_NET_LIBRARIES  ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} wsock32 ws2_32 )
+#else()
+# SET(bpstore_NET_LIBRARIES ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} )
+#endif()
 
 SET(bpstore_LIBRARIES bpstore ${bpstore_PRIVATE_LIBRARIES} ${bpstore_NET_LIBRARIES} CACHE STRING "bpstore libs")
 
