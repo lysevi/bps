@@ -1,7 +1,5 @@
 # bps
 
-<p align="left"><img src="artwork/logo.small.png"></p>
-<b>
 <table>
     <tr>
         <td>
