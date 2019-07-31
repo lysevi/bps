@@ -41,7 +41,7 @@ endif(CMAKE_BUILD_TYPE EQUAL "Debug")
 
 MESSAGE(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
 
-option(bpstore_ENABLE_TESTS "Enable testing of the solidarity." ON)
+option(bpstore_ENABLE_TESTS "Enable testing of the bpstore." ON)
 option(bpstore_ENABLE_DOUBLECHECKS "More checks in code." ${DOUBLE_CHECKS})
 option(bpstore_ENABLE_BENCHMARKS "Enable build benchmarks." ON)
 option(bpstore_COVER "coverage mode" OFF)

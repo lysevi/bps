@@ -2,7 +2,7 @@ language: cpp
 compiler: gcc
 dist: xenial
 
-repo_token: 8fED6K5jbjn44SCw2umhjAgXeTy21JTEX
+repo_token: dr5OQABsv8ym2Ul6V1gmh8GBmH4HgMSRx
 
 cache: ccache
 
@@ -115,7 +115,7 @@ script:
       lcov -r coverage.info "$(readlink -f perftest)/*"  -o coverage.info # remove data for .cpp files
       echo "lcov --list coverage.info" 
       lcov -l coverage.info                                              # just list a short summary of the results
-      coveralls-lcov --repo-token='8fED6K5jbjn44SCw2umhjAgXeTy21JTEX' coverage.info  # upload results
+      coveralls-lcov --repo-token='dr5OQABsv8ym2Ul6V1gmh8GBmH4HgMSRx' coverage.info  # upload results
       bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
       exit
     fi
