@@ -2,7 +2,7 @@ set(PROJECT "bpstore")
 project (${PROJECT} VERSION 0.0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/config.h.cmake ${CMAKE_CURRENT_SOURCE_DIR}/config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/config.h.cmake ${PROJECT}/config.h)
 
 
 FILE(GLOB GLOB_HDRS "*.h")
