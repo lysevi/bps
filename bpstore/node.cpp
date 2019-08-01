@@ -16,21 +16,21 @@ void insert_to_array(T *array, size_t sz, size_t insert_pos, const T &value) {
 }
 
 
-node_t::node_t(bool is_leaf_, uint32_t cap)
+leaf_t::leaf_t(bool is_leaf_, uint32_t cap)
     : is_leaf(is_leaf_)
     , capacity(cap)
     , size(0)
     , keys(cap)
     , values(is_leaf ? cap : 0)
-    , children(is_leaf ? 0 : cap) {}
+    /*, children(is_leaf ? 0 : cap) */{}
 
-node_t ::~node_t() {
+leaf_t ::~leaf_t() {
   keys.clear();
   values.clear();
-  children.clear();
+  //children.clear();
 }
 
-bool node_t::insert(slice_t &k, slice_t &v) {
+bool leaf_t::insert(slice_t &k, slice_t &v) {
   ENSURE(is_leaf);
   ENSURE(keys.size() == capacity);
   ENSURE(values.size() == capacity);
@@ -81,7 +81,7 @@ bool node_t::insert(slice_t &k, slice_t &v) {
   return true;
 }
 
-EXPORT std::optional<slice_t> node_t::find(const slice_t &k) const {
+EXPORT std::optional<slice_t> leaf_t::find(const slice_t &k) const {
   auto lb_iter = std::lower_bound(
       this->keys.begin(),
       this->keys.begin() + size,
