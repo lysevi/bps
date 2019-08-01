@@ -3,6 +3,7 @@
 #include <bpstore/utils/exception.h>
 
 #include <cstdint>
+#include <vector>
 
 namespace bpstore {
 using slice_size_t = uint32_t;
@@ -33,9 +34,9 @@ struct node_t {
   uint32_t capacity;
   uint32_t size;
 
-  slice_t *keys;
-  slice_t *values;
-  storage_ptr_t *children;
+  std::vector<slice_t> keys;
+  std::vector<slice_t> values;
+  std::vector<storage_ptr_t> children;
 
   EXPORT node_t(bool is_leaf_, uint32_t cap);
   EXPORT ~node_t();
