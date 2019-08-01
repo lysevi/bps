@@ -85,7 +85,8 @@ TEMPLATE_TEST_CASE("storage.node_t", "[store]", (std::pair<size_t, uint8_t>)) {
     }
     if (n.size > 1) {
       for (size_t i = 1; i < n.size; ++i) {
-        EXPECT_EQ(n.keys[i].compare(n.keys[i - 1]), 1);
+        int cmp = n.keys[i].compare(n.keys[i - 1]);
+        EXPECT_EQ(cmp, 1);
       }
     }
   }
