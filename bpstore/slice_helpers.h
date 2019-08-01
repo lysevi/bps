@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bpstore/node.h>
+#include <bpstore/slice.h>
 #include <bpstore/utils/exception.h>
 #include <cstring>
 #include <type_traits>
