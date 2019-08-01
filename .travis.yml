@@ -137,7 +137,7 @@ script:
   - echo "TSAN_OPTIONS => " ${TSAN_OPTIONS}
   - |
     if [[ "${HAS_TSAN}" = "true" ]];  then 
-      cmake -Dbpstore_ENABLE_TESTS=ON -Dbpstore_ENABLE_BENCHMARKS=OFF -Dbpstore_ENABLE_EXAMPLES=ON -Dbpstore_ENABLE_DOUBLECHECKS=ON -DCMAKE_BUILD_TYPE=Debug   -DCMAKE_CXX_FLAGS="${CXX_FLAGS} -g  -O1 -fsanitize=thread -fPIE" -DCMAKE_BUILD_TYPE=Debug ..
+      cmake -Dbpstore_ENABLE_TESTS=ON -Dbpstore_ENABLE_BENCHMARKS=OFF  -Dbpstore_ENABLE_DOUBLECHECKS=ON -DCMAKE_BUILD_TYPE=Debug   -DCMAKE_CXX_FLAGS="${CXX_FLAGS} -g  -O1 -fsanitize=thread -fPIE" -DCMAKE_BUILD_TYPE=Debug ..
       make -k -j2 
       ctest -j2 -C Debug .  --verbose || exit 1
       exit
@@ -145,7 +145,7 @@ script:
   
   - |
     if [[ "${HAS_UBSAN}" = "true" ]];  then 
-      cmake -Dbpstore_ENABLE_TESTS=ON -Dbpstore_ENABLE_BENCHMARKS=OFF -Dbpstore_ENABLE_EXAMPLES=ON -Dbpstore_ENABLE_DOUBLECHECKS=ON -DCMAKE_BUILD_TYPE=Debug   -DCMAKE_CXX_FLAGS="${CXX_FLAGS} -g  -O1 -fsanitize=undefined -fno-omit-frame-pointer"  -DCMAKE_BUILD_TYPE=Debug .. 
+      cmake -Dbpstore_ENABLE_TESTS=ON -Dbpstore_ENABLE_BENCHMARKS=OFF  -Dbpstore_ENABLE_DOUBLECHECKS=ON -DCMAKE_BUILD_TYPE=Debug   -DCMAKE_CXX_FLAGS="${CXX_FLAGS} -g  -O1 -fsanitize=undefined -fno-omit-frame-pointer"  -DCMAKE_BUILD_TYPE=Debug .. 
       make -k -j2 
       ctest -j2 -C Debug .  --verbose || exit 1 
       exit 
@@ -154,12 +154,12 @@ script:
   
   - |
     if [[ "${HAS_ASAN}" = "true" ]];  then 
-      cmake -Dbpstore_ENABLE_TESTS=ON -Dbpstore_ENABLE_BENCHMARKS=OFF -Dbpstore_ENABLE_EXAMPLES=ON -Dbpstore_ENABLE_DOUBLECHECKS=ON -DCMAKE_BUILD_TYPE=Debug   -DCMAKE_CXX_FLAGS="${CXX_FLAGS} -g  -O1 -fsanitize=address -fno-omit-frame-pointer"  -DCMAKE_BUILD_TYPE=Debug ..
+      cmake -Dbpstore_ENABLE_TESTS=ON -Dbpstore_ENABLE_BENCHMARKS=OFF  -Dbpstore_ENABLE_DOUBLECHECKS=ON -DCMAKE_BUILD_TYPE=Debug   -DCMAKE_CXX_FLAGS="${CXX_FLAGS} -g  -O1 -fsanitize=address -fno-omit-frame-pointer"  -DCMAKE_BUILD_TYPE=Debug ..
       make -k -j2
       ctest -j2 -C Debug .  --verbose || exit 1 
       exit 
     fi
 
-  - cmake -Dbpstore_ENABLE_TESTS=ON -Dbpstore_ENABLE_BENCHMARKS=OFF -Dbpstore_ENABLE_EXAMPLES=ON -Dbpstore_ENABLE_DOUBLECHECKS=ON ..
+  - cmake -Dbpstore_ENABLE_TESTS=ON -Dbpstore_ENABLE_BENCHMARKS=OFF  -Dbpstore_ENABLE_DOUBLECHECKS=ON ..
   - make -k -j 2
 

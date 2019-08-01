@@ -1,6 +1,7 @@
 #include <bpstore/node.h>
 #include <bpstore/utils/utils.h>
 #include <algorithm>
+#include <cstring>
 
 using namespace bpstore;
 
