@@ -20,6 +20,20 @@ void slice_t::operator=(const slice_t &cp) {
   }
 }
 
+slice_t::slice_t(slice_t &&cp)
+    : size(cp.size)
+    , data(std::move(cp.data)) {
+  cp.size = 0;
+  cp.data = nullptr;
+}
+
+void slice_t::operator=(slice_t &&cp) {
+  size = cp.size;
+  data = cp.data;
+  cp.size = 0;
+  cp.data = nullptr;
+}
+
 template <class T>
 void insert_to_array(T *array, size_t sz, size_t insert_pos, const T &value) {
   for (auto i = sz - 1; i > insert_pos; i--) {
