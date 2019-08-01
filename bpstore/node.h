@@ -27,7 +27,7 @@ struct slice_t {
 
   ~slice_t() {
     if (data != nullptr) {
-      delete data;
+      delete[] data;
       data = nullptr;
     }
     size = 0;
