@@ -14,8 +14,10 @@ slice_t::slice_t(const slice_t &cp) {
 
 void slice_t::operator=(const slice_t &cp) {
   size = cp.size;
-  data = new uint8_t[cp.size];
-  std::memcpy(data, cp.data, size);
+  if (cp.size > 0) {
+    data = new uint8_t[cp.size];
+    std::memcpy(data, cp.data, size);
+  }
 }
 
 template <class T>
