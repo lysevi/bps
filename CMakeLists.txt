@@ -34,10 +34,9 @@ include(AddCXXCompilerFlag)
 include(CompillerSettings)
 
 set(DOUBLE_CHECKS  OFF)
-if (CMAKE_BUILD_TYPE EQUAL "Debug")
-    message(STATUS "debug mode")
-	set(DOUBLE_CHECKS  ON)
-endif(CMAKE_BUILD_TYPE EQUAL "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(DOUBLE_CHECKS  ON)
+endif()
 
 MESSAGE(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
 
@@ -51,6 +50,13 @@ MESSAGE(STATUS "bpstore_ENABLE_TESTS - " ${bpstore_ENABLE_TESTS})
 MESSAGE(STATUS "bpstore_ENABLE_DOUBLECHECKS - " ${bpstore_ENABLE_DOUBLECHECKS})
 MESSAGE(STATUS "bpstore_ENABLE_BENCHMARKS - " ${bpstore_ENABLE_BENCHMARKS})
 
+IF(bpstore_ENABLE_DOUBLECHECKS)
+ MESSAGE(STATUS "Enable double checks.")
+ add_definitions(-DDOUBLE_CHECKS)
+ if(MSVC)
+   add_definitions(-D_ITERATOR_DEBUG_LEVEL=1)
+ ENDIF(MSVC)
+endif()
 
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
