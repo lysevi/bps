@@ -37,6 +37,11 @@ struct slice_t {
   // == 0 if this == o,
   // >  0 if this >  o
   EXPORT int compare(const slice_t &o) const;
+  void free_memory() {
+    delete[] data;
+    data = nullptr;
+    size = 0;
+  }
 };
 
 using storage_ptr_t = uint64_t;

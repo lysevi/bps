@@ -21,9 +21,7 @@ void slice_t::operator=(const slice_t &cp) {
   }
 
   if (data != nullptr) {
-    delete[] data;
-    data = nullptr;
-    size = 0;
+    free_memory();
   }
   if (cp.size > 0) {
     ENSURE(data == nullptr);
@@ -42,10 +40,8 @@ slice_t::slice_t(slice_t &&cp)
 }
 
 void slice_t::operator=(slice_t &&cp) {
-  size = cp.size;
-  data = cp.data;
-  cp.size = 0;
-  cp.data = nullptr;
+  std::swap(cp.data, data);
+  std::swap(cp.size, size);
 }
 
 template <class T>
