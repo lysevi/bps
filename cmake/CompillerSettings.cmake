@@ -9,7 +9,7 @@ else(WIN32)
   MESSAGE(STATUS "UNIX")
   add_definitions(-DUNIX_OS)
 
-  IF(ENABLE_DOUBLECHECKS)
+  IF(bpstore_ENABLE_DOUBLECHECKS)
     MESSAGE(STATUS "Enable cc:rdynamic")
     add_cxx_compiler_flag(-rdynamic)
   ENDIF()
