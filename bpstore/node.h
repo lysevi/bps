@@ -3,6 +3,7 @@
 #include <bpstore/utils/exception.h>
 
 #include <cstdint>
+#include <optional>
 #include <vector>
 
 namespace bpstore {
@@ -15,11 +16,19 @@ struct slice_t {
       : size(sz)
       , data(val) {}
 
+  EXPORT slice_t(const slice_t &cp);
+  EXPORT void operator=(const slice_t &cp);
+
   slice_t()
       : size(0)
       , data(nullptr) {}
 
-  ~slice_t() { delete data; }
+  ~slice_t() {
+    if (data != nullptr) {
+      delete data;
+      data = nullptr;
+    }
+  }
 
   // <  0 if this <  o,
   // == 0 if this == o,
@@ -42,6 +51,7 @@ struct node_t {
   EXPORT ~node_t();
 
   EXPORT bool insert(slice_t &k, slice_t &v);
+  EXPORT std::optional<slice_t> find(const slice_t &k) const;
 };
 
 } // namespace bpstore

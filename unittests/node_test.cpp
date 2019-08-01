@@ -7,6 +7,8 @@
 
 #include <catch.hpp>
 
+#include <iostream>
+
 TEMPLATE_TEST_CASE("storage.slice_t", "[store]", size_t, uint32_t, uint64_t) {
   using namespace bpstore;
   for (TestType i = 1; i < 10; ++i) {
@@ -32,13 +34,62 @@ TEMPLATE_TEST_CASE("storage.node_t", "[store]", (std::pair<size_t, uint8_t>)) {
   using test_val_type = typename TestType::second_type;
 
   uint32_t node_cap = 10;
-  node_t n(true, node_cap);
-
-  for (test_key_type k = 0; k < static_cast<test_key_type>(node_cap); ++k) {
-    for (test_val_type v = 0; v < static_cast<test_val_type>(node_cap); ++v) {
+  SECTION("storage.node_t(0..cap)") {
+    node_t n(true, node_cap);
+    test_val_type tval(0);
+    for (test_key_type k = 0; k <= static_cast<test_key_type>(node_cap); ++k) {
+      tval++;
       auto slice_k = slice_make_from(k);
-      auto slice_v = slice_make_from(v);
-      n.insert(slice_k, slice_v);
+      auto slice_v = slice_make_from(tval);
+      auto res = n.insert(slice_k, slice_v);
+      EXPECT_TRUE(res || k == node_cap);
+      if (res) {
+        auto v = n.find(slice_k);
+        EXPECT_TRUE(v.has_value());
+        EXPECT_TRUE(v.value().compare(slice_v) == 0);
+      }
+    }
+  }
+
+  SECTION("storage.node_t(0..cap). write twice") {
+    node_t n(true, node_cap);
+    test_val_type tval(0);
+    for (test_key_type k = 0; k <= static_cast<test_key_type>(node_cap); ++k) {
+      auto slice_k = slice_make_from(k);
+      auto slice_v = slice_make_from(tval);
+      auto res = n.insert(slice_k, slice_v);
+      EXPECT_TRUE(res || k == node_cap);
+      if (!res && k == node_cap) {
+        break;
+      }
+      tval++;
+      slice_v = slice_make_from(tval);
+      res = n.insert(slice_k, slice_v);
+     
+      EXPECT_TRUE(res);
+
+      if (res) {
+        auto v = n.find(slice_k);
+        EXPECT_TRUE(v.has_value());
+        EXPECT_TRUE(v.value().compare(slice_v) == 0);
+      }
+    }
+  }
+
+  SECTION("storage.node_t(cap..0).") {
+    node_t n(true, node_cap);
+    test_val_type tval(0);
+    for (test_key_type k = static_cast<test_key_type>(node_cap); k > 0; --k) {
+      tval++;
+      auto slice_k = slice_make_from(k);
+      auto slice_v = slice_make_from(tval);
+      auto res = n.insert(slice_k, slice_v);
+      EXPECT_TRUE(res || k == 0);
+      if (res) {
+        auto v = n.find(slice_k);
+        EXPECT_TRUE(v.has_value());
+        EXPECT_TRUE(v.value().compare(slice_v) == 0);
+      }
     }
   }
 }
