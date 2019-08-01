@@ -8,14 +8,28 @@ using namespace bpstore;
 
 slice_t::slice_t(const slice_t &cp) {
   size = cp.size;
-  data = new uint8_t[cp.size];
-  std::memcpy(data, cp.data, size);
+  if (cp.size > 0) {
+    data = new uint8_t[size];
+    std::memcpy(data, cp.data, size);
+  }
 }
 
 void slice_t::operator=(const slice_t &cp) {
-  size = cp.size;
+  if (data != nullptr && size == cp.size) {
+    std::memcpy(data, cp.data, size);
+    return;
+  }
+
+  if (data != nullptr) {
+    delete[] data;
+    data = nullptr;
+    size = 0;
+  }
   if (cp.size > 0) {
+    ENSURE(data == nullptr);
+    ENSURE(size == 0);
     data = new uint8_t[cp.size];
+    size = cp.size;
     std::memcpy(data, cp.data, size);
   }
 }
