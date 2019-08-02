@@ -12,12 +12,12 @@
 TEMPLATE_TEST_CASE("storage.tree_t: insert/find kv",
                    "[store]",
                    (std::pair<size_t, uint8_t>)) {
-  using namespace bpstore;
+  /*using namespace bpstore;
   using test_key_type = typename TestType::first_type;
   using test_val_type = typename TestType::second_type;
 
   tree_params_t params;
-  params.node_capacity = 3;
+  params.node_capacity = 3;*/
   
   //std::vector<test_key_type> keys(params.node_capacity);
 

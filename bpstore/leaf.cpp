@@ -1,11 +1,12 @@
 #include <algorithm>
-#include <bpstore/node.h>
+#include <bpstore/leaf.h>
 #include <bpstore/utils/exception.h>
 #include <bpstore/utils/utils.h>
 #include <cstring>
 #include <iterator>
 
 using namespace bpstore;
+using bpstore::utils::insert_to_array;
 
 leaf_t::leaf_t(capacity_t cap)
     : capacity(cap)
@@ -92,14 +93,3 @@ EXPORT std::optional<slice_t> leaf_t::find(const slice_t &k) const {
   return {};
 }
 
-node_t::node_t(uint32_t cap)
-    : capacity(cap)
-    , size(0)
-    , keys(cap)
-    , children(cap) {}
-
-node_t::~node_t() {
-  size = 0;
-  keys.clear();
-  children.clear();
-}
