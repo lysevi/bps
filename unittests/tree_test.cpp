@@ -15,7 +15,7 @@ using bpstore::utils::logging::logger_manager;
 using bpstore::utils::logging::prefix_logger;
 using namespace bpstore;
 
-struct mock_block_storage : iblock_storage {
+struct mock_block_storage final : iblock_storage {
   virtual ~mock_block_storage() {}
 
   leaf_ptr_t load_max_leaf(tree_params_t &) override {
