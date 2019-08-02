@@ -19,7 +19,7 @@ leaf_t ::~leaf_t() {
   values.clear();
 }
 
-bool leaf_t::insert(slice_t &k, slice_t &v) {
+bool leaf_t::insert(slice_t &k, slice_t &v) noexcept {
   ENSURE(keys.size() == capacity);
   ENSURE(values.size() == capacity);
 
@@ -69,7 +69,7 @@ bool leaf_t::insert(slice_t &k, slice_t &v) {
   return true;
 }
 
-EXPORT std::optional<slice_t> leaf_t::find(const slice_t &k) const {
+EXPORT std::optional<slice_t> leaf_t::find(const slice_t &k) const noexcept {
   auto lb_iter = std::lower_bound(
       this->keys.begin(),
       this->keys.begin() + size,

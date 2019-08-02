@@ -47,7 +47,7 @@ public:
 using abstract_logger_ptr = std::shared_ptr<abstract_logger>;
 using abstract_logger_uptr = std::unique_ptr<abstract_logger>;
 
-class prefix_logger : public abstract_logger {
+class prefix_logger final: public abstract_logger {
 public:
   prefix_logger(abstract_logger_ptr target, const std::string &prefix)
       : _prefix(prefix)
