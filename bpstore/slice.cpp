@@ -43,7 +43,7 @@ void slice_t::operator=(slice_t &&cp) {
   std::swap(cp.size, size);
 }
 
-int slice_t::compare(const slice_t &o) const noexcept {
+int slice_t::compare(const slice_t &o) const  {
   ENSURE(data != nullptr);
   ENSURE(o.data != nullptr);
   const uint32_t minimal_size = std::min(size, o.size);
