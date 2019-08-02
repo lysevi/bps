@@ -23,11 +23,7 @@ struct slice_t {
   EXPORT void operator=(const slice_t &cp);
 
   ~slice_t() {
-    if (data != nullptr) {
-      delete[] data;
-      data = nullptr;
-    }
-    size = 0;
+    free_memory();
   }
 
   // <  0 if this <  o,
@@ -35,8 +31,10 @@ struct slice_t {
   // >  0 if this >  o
   EXPORT int compare(const slice_t &o) const;
   void free_memory() {
-    delete[] data;
-    data = nullptr;
+    if (data != nullptr) {
+      delete[] data;
+      data = nullptr;
+    }
     size = 0;
   }
 };
