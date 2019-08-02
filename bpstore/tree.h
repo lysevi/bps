@@ -47,9 +47,9 @@ public:
   EXPORT std::optional<slice_t> find(const slice_t &k) const;
 
 private:
-  tree_params_t _params;
   iblock_storage *const _storage;
   bpstore::utils::logging::abstract_logger_ptr _logger;
+  tree_params_t _params;
 
   leaf_ptr_t _last_leaf;
 };
