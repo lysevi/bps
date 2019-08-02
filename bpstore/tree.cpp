@@ -18,8 +18,8 @@ node_t::~node_t() {
 
 tree_t::tree_t(const bpstore::utils::logging::abstract_logger_ptr &logger,
                iblock_storage *storage)
-    : _logger(logger)
-    , _storage(storage) {
+    : _storage(storage)
+    , _logger(logger) {
   _logger->info("Tree start.");
   ENSURE(storage != nullptr);
 }
