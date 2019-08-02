@@ -2,6 +2,7 @@
 
 #include <bpstore/exports.h>
 #include <bpstore/leaf.h>
+#include <bpstore/utils/logger.h>
 
 namespace bpstore {
 
@@ -27,11 +28,15 @@ struct node_t {
 
 class tree_t {
 public:
-  EXPORT tree_t(iblock_storage *storage);
+  EXPORT tree_t(const bpstore::utils::logging::abstract_logger_ptr &logger, iblock_storage *storage);
   EXPORT ~tree_t();
+
+  EXPORT bool insert(slice_t &k, slice_t &v);
+  EXPORT std::optional<slice_t> find(const slice_t &k) const;
 
 private:
   iblock_storage *const _storage;
+  bpstore::utils::logging::abstract_logger_ptr _logger;
 };
 
 } // namespace bpstore
