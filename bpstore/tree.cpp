@@ -16,25 +16,42 @@ node_t::~node_t() {
   children.clear();
 }
 
-tree_t::tree_t(const bpstore::utils::logging::abstract_logger_ptr &logger,
+tree_t::tree_t(const tree_params_t &params,
+               const bpstore::utils::logging::abstract_logger_ptr &logger,
                iblock_storage *storage)
     : _storage(storage)
-    , _logger(logger) {
-  _logger->info("Tree start.");
+    , _logger(logger)
+    , _params(params) {
+  _logger->info("start.");
   ENSURE(storage != nullptr);
+
+  _last_leaf = _storage->load_max_leaf(_params);
+  if (_last_leaf == nullptr) {
+    _logger->info("create first leaf.");
+    _last_leaf = _storage->create_leaf(_params);
+    ENSURE(_last_leaf->address != k_storage_ptr_null);
+    ENSURE(_last_leaf->capacity == _params.node_capacity);
+  }
 }
 
 tree_t::~tree_t() {
-  _logger->info("Tree stop.");
+  _logger->info("stop.");
 }
 
 bool tree_t::insert(slice_t &k, slice_t &v) {
-  UNUSED(k);
-  UNUSED(v);
-  return true;
+  auto insertion_result = false;
+  if (_last_leaf->empty()
+      || _last_leaf->first_key()->compare(k) <= 0) { // key >= last_leaf[0]
+    insertion_result = _last_leaf->insert(k, v);
+  }
+  if (!insertion_result) {
+  }
+  return insertion_result;
 }
 
 std::optional<slice_t> tree_t::find(const slice_t &k) const {
-  UNUSED(k);
+  if (_last_leaf->first_key()->compare(k) <= 0) {
+    return _last_leaf->find(k);
+  }
   return {};
 }
