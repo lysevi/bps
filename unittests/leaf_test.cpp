@@ -36,6 +36,8 @@ TEMPLATE_TEST_CASE("storage.leaf_t: insert/find kv",
   }
 
   leaf_t n(node_cap);
+  EXPECT_EQ(n.address, k_storage_ptr_null);
+
   test_val_type tval(0);
   if (shuffled_keys) {
     std::shuffle(keys.begin(), keys.end(), std::mt19937{std::random_device{}()});
@@ -46,7 +48,13 @@ TEMPLATE_TEST_CASE("storage.leaf_t: insert/find kv",
     auto slice_v = slice_make_from(tval);
     auto res = n.insert(slice_k, slice_v);
 
-    auto is_last = (keys.front() < keys.back() ? k == node_cap : k == 0);
+    EXPECT_EQ(n.first_key()->compare(n.keys[0]), 0);
+    if (keys.front() < keys.back() && !shuffled_keys) {
+      EXPECT_EQ(n.last_key()->compare(slice_k), 0);
+    }
+
+    auto is_last
+        = (((keys.front() < keys.back()) && !shuffled_keys) ? k == node_cap : k == 0);
     EXPECT_TRUE(res || is_last);
     if (res) {
       auto v = n.find(slice_k);
