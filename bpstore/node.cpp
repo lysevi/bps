@@ -7,31 +7,18 @@
 
 using namespace bpstore;
 
-template <class T>
-void insert_to_array(T *array, size_t sz, size_t insert_pos, const T &value) {
-  for (auto i = sz - 1; i > insert_pos; i--) {
-    std::swap(array[i], array[i - 1]);
-  }
-  array[insert_pos] = value;
-}
-
-
-leaf_t::leaf_t(bool is_leaf_, uint32_t cap)
-    : is_leaf(is_leaf_)
-    , capacity(cap)
+leaf_t::leaf_t(capacity_t cap)
+    : capacity(cap)
     , size(0)
     , keys(cap)
-    , values(is_leaf ? cap : 0)
-    /*, children(is_leaf ? 0 : cap) */{}
+    , values(cap) {}
 
 leaf_t ::~leaf_t() {
   keys.clear();
   values.clear();
-  //children.clear();
 }
 
 bool leaf_t::insert(slice_t &k, slice_t &v) {
-  ENSURE(is_leaf);
   ENSURE(keys.size() == capacity);
   ENSURE(values.size() == capacity);
 
@@ -103,4 +90,16 @@ EXPORT std::optional<slice_t> leaf_t::find(const slice_t &k) const {
     }
   }
   return {};
+}
+
+node_t::node_t(uint32_t cap)
+    : capacity(cap)
+    , size(0)
+    , keys(cap)
+    , children(cap) {}
+
+node_t::~node_t() {
+  size = 0;
+  keys.clear();
+  children.clear();
 }
