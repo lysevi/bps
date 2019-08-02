@@ -35,7 +35,7 @@ TEMPLATE_TEST_CASE("storage.leaf_t: insert/find kv",
     std::iota(keys.rbegin(), keys.rend(), test_key_type(0));
   }
 
-  leaf_t n(true, node_cap);
+  leaf_t n(node_cap);
   test_val_type tval(0);
   if (shuffled_keys) {
     std::shuffle(keys.begin(), keys.end(), std::mt19937{std::random_device{}()});
