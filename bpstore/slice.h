@@ -29,7 +29,7 @@ struct slice_t {
   // <  0 if this <  o,
   // == 0 if this == o,
   // >  0 if this >  o
-  EXPORT int compare(const slice_t &o) const noexcept;
+  EXPORT int compare(const slice_t &o) const ;
   void free_memory() {
     if (data != nullptr) {
       delete[] data;
