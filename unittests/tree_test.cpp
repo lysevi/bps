@@ -55,6 +55,24 @@ struct mock_block_storage final : iblock_storage {
     return res;
   }
 
+  iblock_storage::save_result_t save(const std::vector<leaf_ptr_t> &ls,
+                                     const std::vector<node_ptr_t> &ns) override {
+    std::vector<leaf_ptr_t> lsaved(ls.size());
+    std::vector<node_ptr_t> nsaved(ns.size());
+    for (auto &lptr : ls) {
+      auto new_l = std::make_shared<leaf_t>(*lptr);
+      new_l->address = ++next_addr;
+      leafs[lptr->address] = new_l;
+    }
+
+    for (auto &lptr : ns) {
+      auto new_l = std::make_shared<node_t>(*lptr);
+      new_l->address = ++next_addr;
+      nodes[lptr->address] = new_l;
+    }
+    return {lsaved, nsaved};
+  }
+
   std::map<storage_ptr_t, leaf_ptr_t> leafs;
   std::map<storage_ptr_t, node_ptr_t> nodes;
   storage_ptr_t next_addr = 0;

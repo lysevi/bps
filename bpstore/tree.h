@@ -5,6 +5,8 @@
 #include <bpstore/utils/logger.h>
 
 #include <memory>
+#include <utility>
+#include <vector>
 
 namespace bpstore {
 
@@ -27,12 +29,17 @@ struct node_t {
 using node_ptr_t = std::shared_ptr<node_t>;
 
 struct iblock_storage {
+  using save_result_t = std::pair<std::vector<leaf_ptr_t>, std::vector<node_ptr_t>>;
   virtual leaf_ptr_t load_max_leaf(tree_params_t &params) = 0;
   virtual leaf_ptr_t create_leaf(tree_params_t &params) = 0;
   virtual leaf_ptr_t load_leaf(const storage_ptr_t ptr) = 0;
 
   virtual node_ptr_t load_node(const storage_ptr_t ptr) = 0;
   virtual node_ptr_t create_node(tree_params_t &params) = 0;
+
+  virtual save_result_t save(const std::vector<leaf_ptr_t> &leafs,
+                             const std::vector<node_ptr_t> &nodes)
+      = 0;
 };
 
 class tree_t {
