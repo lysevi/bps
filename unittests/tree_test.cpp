@@ -10,6 +10,7 @@
 #include <catch.hpp>
 
 #include <map>
+#include <list>
 
 using bpstore::utils::logging::logger_manager;
 using bpstore::utils::logging::prefix_logger;
