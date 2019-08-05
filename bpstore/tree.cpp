@@ -38,13 +38,12 @@ tree_t::~tree_t() {
   _logger->info("stop.");
 }
 
-bool tree_t::insert(slice_t &k, slice_t &v) {
-  auto insertion_result = false;
-  if (_last_leaf->empty()
-      || _last_leaf->first_key()->compare(k) <= 0) { // key >= last_leaf[0]
-    insertion_result = _last_leaf->insert(k, v);
-  }
+bool tree_t::insert(const slice_t &k, const slice_t &v) {
+  auto bucket = target(k);
+  auto insertion_result = bucket->insert(k, v);
+
   if (!insertion_result) {
+    THROW_EXCEPTION("tree_t::insert: ");
   }
   return insertion_result;
 }
@@ -54,4 +53,12 @@ std::optional<slice_t> tree_t::find(const slice_t &k) const {
     return _last_leaf->find(k);
   }
   return {};
+}
+
+leaf_ptr_t tree_t::target(const slice_t &k) const {
+  if (_last_leaf->empty()
+      || _last_leaf->first_key()->compare(k) <= 0) { // key >= last_leaf[0]
+    return _last_leaf;
+  }
+  return nullptr;
 }

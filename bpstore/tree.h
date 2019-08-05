@@ -12,6 +12,7 @@ namespace bpstore {
 
 struct tree_params_t {
   capacity_t node_capacity;
+  float node_filling_percent = 1.0;
 };
 
 struct node_t {
@@ -50,9 +51,11 @@ public:
          iblock_storage *storage);
   EXPORT ~tree_t();
 
-  EXPORT bool insert(slice_t &k, slice_t &v);
+  EXPORT bool insert(const slice_t &k, const slice_t &v);
   EXPORT std::optional<slice_t> find(const slice_t &k) const;
 
+protected:
+  leaf_ptr_t target(const slice_t&k)const;
 private:
   iblock_storage *const _storage;
   bpstore::utils::logging::abstract_logger_ptr _logger;
