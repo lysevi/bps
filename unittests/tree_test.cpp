@@ -40,6 +40,20 @@ struct mock_block_storage final : iblock_storage {
     }
   }
 
+  node_ptr_t load_root() override {
+    std::list<node_ptr_t> roots;
+    for (auto &kv : nodes) {
+      if (kv.second->is_root) {
+        roots.push_back(kv.second);
+      }
+    }
+    auto max_pos = std::max_element(
+        roots.cbegin(), roots.cend(), [](const auto &n1, const auto &n2) {
+          return n1->address < n2->address;
+        });
+    return *max_pos;
+  }
+
   node_ptr_t load_node(const storage_ptr_t ptr) override {
     if (auto it = nodes.find(ptr); it != nodes.end()) {
       return it->second;

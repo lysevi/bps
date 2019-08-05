@@ -16,6 +16,7 @@ struct tree_params_t {
 };
 
 struct node_t {
+  bool is_root = false;
   storage_ptr_t address = k_storage_ptr_null;
   bool children_is_leaf = false;
   uint32_t capacity;
@@ -35,6 +36,7 @@ struct iblock_storage {
   virtual leaf_ptr_t create_leaf(tree_params_t &params) = 0;
   virtual leaf_ptr_t load_leaf(const storage_ptr_t ptr) = 0;
 
+  virtual node_ptr_t load_root() = 0;
   virtual node_ptr_t load_node(const storage_ptr_t ptr) = 0;
   virtual node_ptr_t create_node(tree_params_t &params) = 0;
 
@@ -55,13 +57,15 @@ public:
   EXPORT std::optional<slice_t> find(const slice_t &k) const;
 
 protected:
-  leaf_ptr_t target(const slice_t&k)const;
+  leaf_ptr_t target(const slice_t &k) const;
+
 private:
   iblock_storage *const _storage;
   bpstore::utils::logging::abstract_logger_ptr _logger;
   tree_params_t _params;
 
   leaf_ptr_t _last_leaf;
+  node_ptr_t _root;
 };
 
 } // namespace bpstore
