@@ -9,8 +9,8 @@
 
 #include <catch.hpp>
 
-#include <map>
 #include <list>
+#include <map>
 
 using bpstore::utils::logging::logger_manager;
 using bpstore::utils::logging::prefix_logger;
@@ -52,6 +52,9 @@ struct mock_block_storage final : iblock_storage {
         roots.cbegin(), roots.cend(), [](const auto &n1, const auto &n2) {
           return n1->address < n2->address;
         });
+    if (max_pos == roots.end()) {
+      return nullptr;
+    }
     return *max_pos;
   }
 
