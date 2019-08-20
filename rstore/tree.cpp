@@ -1,8 +1,8 @@
-#include <bpstore/tree.h>
-#include <bpstore/utils/exception.h>
-#include <bpstore/utils/utils.h>
+#include <rstore/tree.h>
+#include <rstore/utils/exception.h>
+#include <rstore/utils/utils.h>
 
-using namespace bpstore;
+using namespace rstore;
 
 node_t::node_t(uint32_t cap)
     : capacity(cap)
@@ -17,7 +17,7 @@ node_t::~node_t() {
 }
 
 tree_t::tree_t(const tree_params_t &params,
-               const bpstore::utils::logging::abstract_logger_ptr &logger,
+               const rstore::utils::logging::abstract_logger_ptr &logger,
                iblock_storage *storage)
     : _storage(storage)
     , _logger(logger)

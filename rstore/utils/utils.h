@@ -3,11 +3,11 @@
 #include <ctime>
 #include <thread>
 
-#include <bpstore/utils/exception.h>
+#include <rstore/utils/exception.h>
 
 #define UNUSED(x) (void)(x)
 
-namespace bpstore::utils {
+namespace rstore::utils {
 
 inline void sleep_mls(long long a) {
   std::this_thread::sleep_for(std::chrono::milliseconds(a));
@@ -29,4 +29,4 @@ void insert_to_array(T *array, size_t sz, size_t insert_pos, const T &value) {
   array[insert_pos] = value;
 }
 
-} // namespace bpstore::utils
+} // namespace rstore::utils

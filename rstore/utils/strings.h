@@ -1,10 +1,10 @@
 #pragma once
 
-#include <bpstore/exports.h>
+#include <rstore/exports.h>
 #include <string>
 #include <vector>
 
-namespace bpstore::utils::strings {
+namespace rstore::utils::strings {
 
 /// split string by space.
 [[nodiscard]] EXPORT std::vector<std::string> tokens(const std::string &str);
@@ -50,4 +50,4 @@ template <class... Args>
   }
   return result;
 }
-} // namespace bpstore::utils::strings
+} // namespace rstore::utils::strings

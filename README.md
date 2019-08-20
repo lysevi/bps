@@ -6,13 +6,13 @@
             master branch
         </td>
         <td>
-            Linux <a href="https://travis-ci.org/lysevi/bps"><img src="https://travis-ci.org/lysevi/bps.svg?branch=master"></a>
+            Linux <a href="https://github.com/lysevi/rstore"><img src="https://github.com/lysevi/rstore.svg?branch=master"></a>
         </td>
         <td>
-            <a href="https://coveralls.io/github/lysevi/bps?branch=master"><img src="https://coveralls.io/repos/github/lysevi/bps/badge.svg?branch=master"></a>
+            <a href="https://coveralls.io/github/lysevi/rstore?branch=master"><img src="https://coveralls.io/repos/github/lysevi/bps/badge.svg?branch=master"></a>
         </td>
         <td>
-            <a href="https://codecov.io/gh/lysevi/bps"><img src="https://codecov.io/gh/lysevi/bps/branch/master/graph/badge.svg"></a>
+            <a href="https://codecov.io/gh/lysevi/rstore"><img src="https://codecov.io/gh/lysevi/rstore/branch/master/graph/badge.svg"></a>
         </td>
     </tr>
     <tr>
@@ -20,10 +20,10 @@
             dev branch
         </td>
         <td>
-            Linux <a href="https://travis-ci.org/lysevi/bps"><img src="https://travis-ci.org/lysevi/bps.svg?branch=dev"></a>
+            Linux <a href="https://github.com/lysevi/rstore"><img src="https://github.com/lysevi/rstore.svg?branch=dev"></a>
         </td>
         <td>
-            <a href="https://coveralls.io/github/lysevi/bps?branch=dev"><img src="https://coveralls.io/repos/github/lysevi/bps/badge.svg?branch=dev"></a>
+            <a href="https://coveralls.io/github/lysevi/rstore?branch=dev"><img src="https://coveralls.io/repos/github/lysevi/bps/badge.svg?branch=dev"></a>
         </td>
     </tr>
 </table>

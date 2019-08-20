@@ -1,14 +1,14 @@
 #pragma once
 
-#include <bpstore/exports.h>
-#include <bpstore/leaf.h>
-#include <bpstore/utils/logger.h>
+#include <rstore/exports.h>
+#include <rstore/leaf.h>
+#include <rstore/utils/logger.h>
 
 #include <memory>
 #include <utility>
 #include <vector>
 
-namespace bpstore {
+namespace rstore {
 
 struct tree_params_t {
   capacity_t node_capacity;
@@ -49,7 +49,7 @@ class tree_t {
 public:
   EXPORT
   tree_t(const tree_params_t &params,
-         const bpstore::utils::logging::abstract_logger_ptr &logger,
+         const rstore::utils::logging::abstract_logger_ptr &logger,
          iblock_storage *storage);
   EXPORT ~tree_t();
 
@@ -61,11 +61,11 @@ protected:
 
 private:
   iblock_storage *const _storage;
-  bpstore::utils::logging::abstract_logger_ptr _logger;
+  rstore::utils::logging::abstract_logger_ptr _logger;
   tree_params_t _params;
 
   leaf_ptr_t _last_leaf;
   node_ptr_t _root;
 };
 
-} // namespace bpstore
+} // namespace rstore

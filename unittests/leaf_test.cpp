@@ -1,5 +1,5 @@
-#include <bpstore/leaf.h>
-#include <bpstore/slice_helpers.h>
+#include <rstore/leaf.h>
+#include <rstore/slice_helpers.h>
 
 #include "helpers.h"
 #include <algorithm>
@@ -12,7 +12,7 @@
 TEMPLATE_TEST_CASE("storage.leaf_t: insert/find kv",
                    "[store]",
                    (std::pair<size_t, uint8_t>)) {
-  using namespace bpstore;
+  using namespace rstore;
   using test_key_type = typename TestType::first_type;
   using test_val_type = typename TestType::second_type;
 

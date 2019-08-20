@@ -1,5 +1,5 @@
-#include <bpstore/slice_helpers.h>
-#include <bpstore/tree.h>
+#include <rstore/slice_helpers.h>
+#include <rstore/tree.h>
 
 #include "helpers.h"
 #include <algorithm>
@@ -12,9 +12,9 @@
 #include <list>
 #include <map>
 
-using bpstore::utils::logging::logger_manager;
-using bpstore::utils::logging::prefix_logger;
-using namespace bpstore;
+using rstore::utils::logging::logger_manager;
+using rstore::utils::logging::prefix_logger;
+using namespace rstore;
 
 struct mock_block_storage final : iblock_storage {
   virtual ~mock_block_storage() {}
@@ -101,7 +101,7 @@ TEMPLATE_TEST_CASE("storage.tree_t: insert/find kv",
                    (std::pair<size_t, uint8_t>)) {
   auto tst_logger = std::make_shared<prefix_logger>(
       logger_manager::instance()->get_shared_logger(), "test?> ");
-  auto tree_logger = std::make_shared<bpstore::utils::logging::prefix_logger>(
+  auto tree_logger = std::make_shared<rstore::utils::logging::prefix_logger>(
       logger_manager::instance()->get_shared_logger(), "tree: ");
 
   tree_params_t params;

@@ -1,6 +1,6 @@
 #pragma once
-#include <bpstore/exports.h>
-#include <bpstore/slice.h>
+#include <rstore/exports.h>
+#include <rstore/slice.h>
 
 #include <cstdint>
 #include <limits>
@@ -8,7 +8,7 @@
 #include <optional>
 #include <vector>
 
-namespace bpstore {
+namespace rstore {
 using capacity_t = uint32_t;
 using storage_ptr_t = uint64_t;
 const storage_ptr_t k_storage_ptr_null = std::numeric_limits<storage_ptr_t>::max();
@@ -47,4 +47,4 @@ struct leaf_t {
 };
 
 using leaf_ptr_t = std::shared_ptr<leaf_t>;
-} // namespace bpstore
+} // namespace rstore

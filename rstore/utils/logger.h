@@ -1,14 +1,14 @@
 #pragma once
 
-#include <bpstore/exports.h>
-#include <bpstore/utils/strings.h>
+#include <rstore/exports.h>
+#include <rstore/utils/strings.h>
 
 #include <fstream>
 #include <memory>
 #include <mutex>
 #include <utility>
 
-namespace bpstore::utils::logging {
+namespace rstore::utils::logging {
 
 enum class MESSAGE_KIND { message, info, warn, fatal };
 
@@ -128,4 +128,4 @@ template <typename... T>
 void logger_fatal(T &&... args) noexcept {
   utils::logging::logger_manager::instance()->get_logger()->fatal(args...);
 }
-} // namespace bpstore::utils::logging
+} // namespace rstore::utils::logging

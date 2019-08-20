@@ -1,8 +1,8 @@
 #include <boost/stacktrace.hpp>
-#include <bpstore/utils/exception.h>
+#include <rstore/utils/exception.h>
 #include <sstream>
 
-using namespace bpstore::utils::exceptions;
+using namespace rstore::utils::exceptions;
 
 exception_t::exception_t() {
   init_msg("");
