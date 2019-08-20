@@ -12,10 +12,10 @@ namespace rstore::utils::logging {
 
 enum class MESSAGE_KIND { message, info, warn, fatal };
 
-class abstract_logger {
+class AbstractLogger {
 public:
   virtual void message(MESSAGE_KIND kind, const std::string &msg) noexcept = 0;
-  virtual ~abstract_logger() {}
+  virtual ~AbstractLogger() {}
 
   template <typename... T>
   void variadic_message(MESSAGE_KIND kind, T &&... args) noexcept {
@@ -44,37 +44,37 @@ public:
   }
 };
 
-using abstract_logger_ptr = std::shared_ptr<abstract_logger>;
-using abstract_logger_uptr = std::unique_ptr<abstract_logger>;
+using AbstractLoggerPtr = std::shared_ptr<AbstractLogger>;
+using AbstractLoggerUptr = std::unique_ptr<AbstractLogger>;
 
-class prefix_logger final : public abstract_logger {
+class PrefixLogger final : public AbstractLogger {
 public:
-  prefix_logger(abstract_logger_ptr target, const std::string &prefix)
+  PrefixLogger(AbstractLoggerPtr target, const std::string &prefix)
       : _prefix(prefix)
       , _shared_target(target) {}
-  ~prefix_logger() override { _shared_target = nullptr; }
+  ~PrefixLogger() override { _shared_target = nullptr; }
   void message(MESSAGE_KIND kind, const std::string &msg) noexcept override {
     _shared_target->message(kind, utils::strings::to_string(_prefix, msg));
   }
 
 private:
   const std::string _prefix;
-  abstract_logger_ptr _shared_target;
+  AbstractLoggerPtr _shared_target;
 };
 
-class console_logger final : public abstract_logger {
+class ConsoleLogger final : public AbstractLogger {
 public:
   EXPORT void message(MESSAGE_KIND kind, const std::string &msg) noexcept override;
 };
 
-class quiet_logger final : public abstract_logger {
+class QuietLogger final : public AbstractLogger {
 public:
   EXPORT void message(MESSAGE_KIND kind, const std::string &msg) noexcept override;
 };
 
-class file_logger final : public abstract_logger {
+class FileLogger final : public AbstractLogger {
 public:
-  EXPORT file_logger(std::string fname, bool _verbose = false);
+  EXPORT FileLogger(std::string fname, bool _verbose = false);
   EXPORT void message(MESSAGE_KIND kind, const std::string &msg) noexcept override;
 
 private:
@@ -85,16 +85,16 @@ private:
 
 enum class VERBOSE_KIND { verbose, debug, quiet };
 
-class logger_manager {
+class LoggerManager {
 public:
   EXPORT static VERBOSE_KIND verbose;
-  logger_manager(abstract_logger_ptr &logger);
-  [[nodiscard]] EXPORT abstract_logger *get_logger() noexcept;
-  [[nodiscard]] EXPORT abstract_logger_ptr get_shared_logger() noexcept;
+  LoggerManager(AbstractLoggerPtr &logger);
+  [[nodiscard]] EXPORT AbstractLogger *get_logger() noexcept;
+  [[nodiscard]] EXPORT AbstractLoggerPtr get_shared_logger() noexcept;
 
-  EXPORT static void start(abstract_logger_ptr &logger);
+  EXPORT static void start(AbstractLoggerPtr &logger);
   EXPORT static void stop();
-  [[nodiscard]] EXPORT static logger_manager *instance() noexcept;
+  [[nodiscard]] EXPORT static LoggerManager *instance() noexcept;
 
   template <typename... T>
   void variadic_message(MESSAGE_KIND kind, T &&... args) noexcept {
@@ -103,29 +103,29 @@ public:
   }
 
 private:
-  static std::shared_ptr<logger_manager> _instance;
+  static std::shared_ptr<LoggerManager> _instance;
   static std::mutex _locker;
   std::mutex _msg_locker;
-  abstract_logger_ptr _logger;
+  AbstractLoggerPtr _logger;
 };
 
 template <typename... T>
 void logger(T &&... args) noexcept {
-  utils::logging::logger_manager::instance()->get_logger()->dbg(args...);
+  utils::logging::LoggerManager::instance()->get_logger()->dbg(args...);
 }
 
 template <typename... T>
 void logger_info(T &&... args) noexcept {
-  utils::logging::logger_manager::instance()->get_logger()->info(args...);
+  utils::logging::LoggerManager::instance()->get_logger()->info(args...);
 }
 
 template <typename... T>
 void logger_warn(T &&... args) noexcept {
-  utils::logging::logger_manager::instance()->get_logger()->warn(args...);
+  utils::logging::LoggerManager::instance()->get_logger()->warn(args...);
 }
 
 template <typename... T>
 void logger_fatal(T &&... args) noexcept {
-  utils::logging::logger_manager::instance()->get_logger()->fatal(args...);
+  utils::logging::LoggerManager::instance()->get_logger()->fatal(args...);
 }
 } // namespace rstore::utils::logging

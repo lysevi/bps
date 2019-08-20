@@ -5,7 +5,7 @@
 
 using namespace rstore;
 
-slice_t::slice_t(const slice_t &cp) {
+Slice::Slice(const Slice &cp) {
   size = cp.size;
   if (cp.size > 0) {
     data = new uint8_t[size];
@@ -13,7 +13,7 @@ slice_t::slice_t(const slice_t &cp) {
   }
 }
 
-void slice_t::operator=(const slice_t &cp) {
+void Slice::operator=(const Slice &cp) {
   if (data != nullptr && size == cp.size) {
     std::memcpy(data, cp.data, size);
     return;
@@ -31,19 +31,19 @@ void slice_t::operator=(const slice_t &cp) {
   }
 }
 
-slice_t::slice_t(slice_t &&cp)
+Slice::Slice(Slice &&cp)
     : size(cp.size)
     , data(std::move(cp.data)) {
   cp.size = 0;
   cp.data = nullptr;
 }
 
-void slice_t::operator=(slice_t &&cp) {
+void Slice::operator=(Slice &&cp) {
   std::swap(cp.data, data);
   std::swap(cp.size, size);
 }
 
-int slice_t::compare(const slice_t &o) const {
+int Slice::compare(const Slice &o) const {
   ENSURE(data != nullptr);
   ENSURE(o.data != nullptr);
   const uint32_t minimal_size = std::min(size, o.size);

@@ -5,29 +5,29 @@
 
 namespace rstore {
 using slice_size_t = uint32_t;
-struct slice_t {
+struct Slice {
   slice_size_t size;
   uint8_t *data;
 
-  slice_t()
+  Slice()
       : size(0)
       , data(nullptr) {}
 
-  slice_t(slice_size_t sz, uint8_t *val)
+  Slice(slice_size_t sz, uint8_t *val)
       : size(sz)
       , data(val) {}
 
-  EXPORT slice_t(slice_t &&cp);
-  EXPORT void operator=(slice_t &&cp);
-  EXPORT slice_t(const slice_t &cp);
-  EXPORT void operator=(const slice_t &cp);
+  EXPORT Slice(Slice &&cp);
+  EXPORT void operator=(Slice &&cp);
+  EXPORT Slice(const Slice &cp);
+  EXPORT void operator=(const Slice &cp);
 
-  ~slice_t() { free_memory(); }
+  ~Slice() { free_memory(); }
 
   // <  0 if this <  o,
   // == 0 if this == o,
   // >  0 if this >  o
-  EXPORT int compare(const slice_t &o) const;
+  EXPORT int compare(const Slice &o) const;
   void free_memory() {
     if (data != nullptr) {
       delete[] data;

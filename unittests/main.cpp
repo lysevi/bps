@@ -9,7 +9,7 @@
 #include <rstore/utils/logger.h>
 #include <sstream>
 
-class UnitTestLogger final : public rstore::utils::logging::abstract_logger {
+class UnitTestLogger final : public rstore::utils::logging::AbstractLogger {
 public:
   static bool verbose;
   bool _write_to_file;
@@ -89,19 +89,19 @@ struct LoggerControl : Catch::TestEventListenerBase {
 
   virtual void testCaseStarting(Catch::TestCaseInfo const &) override {
     _raw_ptr = new UnitTestLogger();
-    _logger = rstore::utils::logging::abstract_logger_ptr{_raw_ptr};
-    rstore::utils::logging::logger_manager::start(_logger);
+    _logger = rstore::utils::logging::AbstractLoggerPtr{_raw_ptr};
+    rstore::utils::logging::LoggerManager::start(_logger);
   }
 
   virtual void testCaseEnded(Catch::TestCaseStats const &testCaseStats) override {
     if (testCaseStats.testInfo.expectedToFail()) {
       _raw_ptr->dump_all();
     }
-    rstore::utils::logging::logger_manager::stop();
+    rstore::utils::logging::LoggerManager::stop();
     _logger = nullptr;
   }
   UnitTestLogger *_raw_ptr;
-  rstore::utils::logging::abstract_logger_ptr _logger;
+  rstore::utils::logging::AbstractLoggerPtr _logger;
 };
 
 CATCH_REGISTER_LISTENER(LoggerControl);

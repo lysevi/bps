@@ -1,5 +1,6 @@
 #include <catch.hpp>
 #include <numeric>
+#include <rstore/utils/cz.h>
 #include <rstore/utils/strings.h>
 #include <rstore/utils/utils.h>
 
@@ -31,5 +32,11 @@ TEST_CASE("utils::strings", "[bench]") {
   std::string target("H e l l o , w o r l d !", 10);
 
   BENCHMARK("strings::split") { UNUSED(rstore::utils::strings::split(target, ' ')); };
+}
+
+TEST_CASE("utils::cz", "[bench]") {
+
+  BENCHMARK("utils::cz::clz") { UNUSED(rstore::utils::clz(3458764513820540928)); };
+  BENCHMARK("utils::cz::ctz") { UNUSED(rstore::utils::ctz(240)); };
 }
 #endif
