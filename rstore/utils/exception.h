@@ -5,8 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-#define CODE_POS                                                                         \
-  (rstore::utils::exceptions::codepos(__FILE__, __LINE__, __FUNCTION__))
+#define CODE_POS (rstore::utils::exceptions::codepos(__FILE__, __LINE__, __FUNCTION__))
 
 #define MAKE_EXCEPTION(msg)                                                              \
   rstore::utils::exceptions::exception_t::create_and_log(CODE_POS, msg)
@@ -62,7 +61,6 @@ private:
   std::string _msg;
 };
 } // namespace rstore::utils::exceptions
-
 
 #define NOT_IMPLEMENTED THROW_EXCEPTION("Not implemented");
 

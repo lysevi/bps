@@ -22,4 +22,3 @@ TEMPLATE_TEST_CASE("storage.slice_t", "[store]", size_t, uint32_t, uint64_t) {
     EXPECT_EQ(slc2.compare(slc), 1);
   }
 }
-

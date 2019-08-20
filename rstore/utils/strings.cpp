@@ -17,7 +17,7 @@ std::vector<std::string> rstore::utils::strings::tokens(const std::string &str) 
 }
 
 std::vector<std::string> rstore::utils::strings::split(const std::string &text,
-                                                           char sep) {
+                                                       char sep) {
   auto n = std::count_if(text.begin(), text.end(), [sep](auto c) { return c == sep; });
 
   std::vector<std::string> tokens;
