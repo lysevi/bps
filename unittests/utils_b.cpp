@@ -15,17 +15,17 @@ TEST_CASE("utils::strings", "[bench]") {
 
   BENCHMARK("strings::to_string") {
     UNUSED(rstore::utils::strings::to_string("Hello, world!",
-                                              int(1),
-                                              float(3.14),
-                                              "Hello, World! Hello, world! Hello, World! "
-                                              "Hello, world! Hello, Worl! Hello, world!",
-                                              int(1),
-                                              float(3.14),
-                                              "Hello, World!"
-                                              "Hello, world!",
-                                              int(1),
-                                              float(3.14),
-                                              "Hello, World!"));
+                                             int(1),
+                                             float(3.14),
+                                             "Hello, World! Hello, world! Hello, World! "
+                                             "Hello, world! Hello, Worl! Hello, world!",
+                                             int(1),
+                                             float(3.14),
+                                             "Hello, World!"
+                                             "Hello, world!",
+                                             int(1),
+                                             float(3.14),
+                                             "Hello, World!"));
   };
 
   std::string target("H e l l o , w o r l d !", 10);

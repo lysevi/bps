@@ -2,9 +2,9 @@
 #include <iostream>
 #include <sstream>
 
+#include <rstore/utils/exception.h>
 #include <rstore/utils/logger.h>
 #include <rstore/utils/utils.h>
-#include <rstore/utils/exception.h>
 
 using namespace rstore::utils::logging;
 

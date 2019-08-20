@@ -1,8 +1,8 @@
 #pragma once
 
+#include <cstring>
 #include <rstore/slice.h>
 #include <rstore/utils/exception.h>
-#include <cstring>
 #include <type_traits>
 
 namespace rstore {
@@ -27,7 +27,7 @@ static slice_t slice_make_from(const T &v, const slice_size_t s) {
 }
 
 template <typename T>
-static std::enable_if_t<std::is_pod_v<T>,  slice_t> slice_make_from(const T &v) {
+static std::enable_if_t<std::is_pod_v<T>, slice_t> slice_make_from(const T &v) {
   auto s = sizeof(v);
   return slice_make_from(v, static_cast<slice_size_t>(s));
 }

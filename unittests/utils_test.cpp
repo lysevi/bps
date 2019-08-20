@@ -6,7 +6,6 @@
 #include <catch.hpp>
 #include <numeric>
 
-
 TEST_CASE("utils.split") {
   std::array<int, 8> tst_a;
   std::iota(tst_a.begin(), tst_a.end(), 1);
@@ -38,7 +37,6 @@ TEST_CASE("utils.to_lower") {
   auto res = rstore::utils::strings::to_lower(s);
   EXPECT_EQ(res, "upper string");
 }
-
 
 void f_throw() {
   throw rstore::utils::exceptions::exception_t("error");

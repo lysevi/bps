@@ -22,14 +22,12 @@ struct slice_t {
   EXPORT slice_t(const slice_t &cp);
   EXPORT void operator=(const slice_t &cp);
 
-  ~slice_t() {
-    free_memory();
-  }
+  ~slice_t() { free_memory(); }
 
   // <  0 if this <  o,
   // == 0 if this == o,
   // >  0 if this >  o
-  EXPORT int compare(const slice_t &o) const ;
+  EXPORT int compare(const slice_t &o) const;
   void free_memory() {
     if (data != nullptr) {
       delete[] data;
@@ -38,4 +36,4 @@ struct slice_t {
     size = 0;
   }
 };
-}
+} // namespace rstore
