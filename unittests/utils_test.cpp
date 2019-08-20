@@ -1,5 +1,6 @@
 #include <rstore/utils/strings.h>
 #include <rstore/utils/utils.h>
+#include <rstore/utils/cz.h>
 
 #include "helpers.h"
 #include <array>
@@ -48,4 +49,13 @@ TEST_CASE("utils.exception") {
   } catch (rstore::utils::exceptions::exception_t &e) {
     rstore::utils::logging::logger_info(e.what());
   }
+}
+
+TEST_CASE("utils.clz") {
+  EXPECT_EQ(rstore::utils::clz(67553994410557440), 8);
+  EXPECT_EQ(rstore::utils::clz(3458764513820540928), 2);
+  EXPECT_EQ(rstore::utils::clz(15), 60);
+
+  EXPECT_EQ(rstore::utils::ctz(240), 4);
+  EXPECT_EQ(rstore::utils::ctz(3840), 8);
 }
