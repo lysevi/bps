@@ -6,10 +6,10 @@
 #include <fstream>
 #include <iostream>
 #include <list>
-#include <bpstore/utils/logger.h>
+#include <rstore/utils/logger.h>
 #include <sstream>
 
-class UnitTestLogger final : public bpstore::utils::logging::abstract_logger {
+class UnitTestLogger final : public rstore::utils::logging::abstract_logger {
 public:
   static bool verbose;
   bool _write_to_file;
@@ -19,7 +19,7 @@ public:
     if (_write_to_file) {
 
       std::stringstream fname_ss;
-      fname_ss << "bpstore_unittests";
+      fname_ss << "rstore_unittests";
       fname_ss << ".log";
 
       auto logname = fname_ss.str();
@@ -32,22 +32,22 @@ public:
   }
   ~UnitTestLogger() {}
 
-  void message(bpstore::utils::logging::MESSAGE_KIND kind,
+  void message(rstore::utils::logging::MESSAGE_KIND kind,
                const std::string &msg) noexcept {
     std::lock_guard lg(_locker);
 
     std::stringstream ss;
     switch (kind) {
-    case bpstore::utils::logging::MESSAGE_KIND::fatal:
+    case rstore::utils::logging::MESSAGE_KIND::fatal:
       ss << "[err] " << msg << std::endl;
       break;
-    case bpstore::utils::logging::MESSAGE_KIND::info:
+    case rstore::utils::logging::MESSAGE_KIND::info:
       ss << "[inf] " << msg << std::endl;
       break;
-    case bpstore::utils::logging::MESSAGE_KIND::warn:
+    case rstore::utils::logging::MESSAGE_KIND::warn:
       ss << "[wrn] " << msg << std::endl;
       break;
-    case bpstore::utils::logging::MESSAGE_KIND::message:
+    case rstore::utils::logging::MESSAGE_KIND::message:
       ss << "[dbg] " << msg << std::endl;
       break;
     }
@@ -58,7 +58,7 @@ public:
       _output->flush();
     }
 
-    if (kind == bpstore::utils::logging::MESSAGE_KIND::fatal) {
+    if (kind == rstore::utils::logging::MESSAGE_KIND::fatal) {
       std::cerr << ss.str();
     } else {
       if (verbose) {
@@ -89,19 +89,19 @@ struct LoggerControl : Catch::TestEventListenerBase {
 
   virtual void testCaseStarting(Catch::TestCaseInfo const &) override {
     _raw_ptr = new UnitTestLogger();
-    _logger = bpstore::utils::logging::abstract_logger_ptr{_raw_ptr};
-    bpstore::utils::logging::logger_manager::start(_logger);
+    _logger = rstore::utils::logging::abstract_logger_ptr{_raw_ptr};
+    rstore::utils::logging::logger_manager::start(_logger);
   }
 
   virtual void testCaseEnded(Catch::TestCaseStats const &testCaseStats) override {
     if (testCaseStats.testInfo.expectedToFail()) {
       _raw_ptr->dump_all();
     }
-    bpstore::utils::logging::logger_manager::stop();
+    rstore::utils::logging::logger_manager::stop();
     _logger = nullptr;
   }
   UnitTestLogger *_raw_ptr;
-  bpstore::utils::logging::abstract_logger_ptr _logger;
+  rstore::utils::logging::abstract_logger_ptr _logger;
 };
 
 CATCH_REGISTER_LISTENER(LoggerControl);

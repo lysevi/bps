@@ -1,12 +1,12 @@
 #include <algorithm>
-#include <bpstore/leaf.h>
-#include <bpstore/utils/exception.h>
-#include <bpstore/utils/utils.h>
+#include <rstore/leaf.h>
+#include <rstore/utils/exception.h>
+#include <rstore/utils/utils.h>
 #include <cstring>
 #include <iterator>
 
-using namespace bpstore;
-using bpstore::utils::insert_to_array;
+using namespace rstore;
+using rstore::utils::insert_to_array;
 
 leaf_t::leaf_t(capacity_t cap)
     : capacity(cap)

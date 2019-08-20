@@ -1,11 +1,11 @@
 #pragma once
 
-#include <bpstore/slice.h>
-#include <bpstore/utils/exception.h>
+#include <rstore/slice.h>
+#include <rstore/utils/exception.h>
 #include <cstring>
 #include <type_traits>
 
-namespace bpstore {
+namespace rstore {
 
 template <typename T>
 T slice_convert_to(const slice_t &sl) {
@@ -31,4 +31,4 @@ static std::enable_if_t<std::is_pod_v<T>,  slice_t> slice_make_from(const T &v) 
   auto s = sizeof(v);
   return slice_make_from(v, static_cast<slice_size_t>(s));
 }
-} // namespace bpstore
+} // namespace rstore

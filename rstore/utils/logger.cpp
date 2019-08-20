@@ -2,11 +2,11 @@
 #include <iostream>
 #include <sstream>
 
-#include <bpstore/utils/logger.h>
-#include <bpstore/utils/utils.h>
-#include <bpstore/utils/exception.h>
+#include <rstore/utils/logger.h>
+#include <rstore/utils/utils.h>
+#include <rstore/utils/exception.h>
 
-using namespace bpstore::utils::logging;
+using namespace rstore::utils::logging;
 
 std::shared_ptr<logger_manager> logger_manager::_instance = nullptr;
 std::mutex logger_manager::_locker;
@@ -96,16 +96,16 @@ void file_logger::message(MESSAGE_KIND kind, const std::string &msg) noexcept {
 
   std::stringstream ss;
   switch (kind) {
-  case bpstore::utils::logging::MESSAGE_KIND::fatal:
+  case rstore::utils::logging::MESSAGE_KIND::fatal:
     ss << "[err] " << msg << std::endl;
     break;
-  case bpstore::utils::logging::MESSAGE_KIND::info:
+  case rstore::utils::logging::MESSAGE_KIND::info:
     ss << "[inf] " << msg << std::endl;
     break;
-  case bpstore::utils::logging::MESSAGE_KIND::warn:
+  case rstore::utils::logging::MESSAGE_KIND::warn:
     ss << "[wrn] " << msg << std::endl;
     break;
-  case bpstore::utils::logging::MESSAGE_KIND::message:
+  case rstore::utils::logging::MESSAGE_KIND::message:
     ss << "[dbg] " << msg << std::endl;
     break;
   }
@@ -114,7 +114,7 @@ void file_logger::message(MESSAGE_KIND kind, const std::string &msg) noexcept {
   _output->flush();
   _output->flush();
 
-  if (_verbose || kind == bpstore::utils::logging::MESSAGE_KIND::fatal) {
+  if (_verbose || kind == rstore::utils::logging::MESSAGE_KIND::fatal) {
     std::cerr << ss.str();
   }
 }

@@ -2,12 +2,12 @@
 #include <clocale>
 #include <ctype.h>
 #include <iterator>
-#include <bpstore/utils/strings.h>
+#include <rstore/utils/strings.h>
 #include <sstream>
 #include <string>
 #include <vector>
 
-std::vector<std::string> bpstore::utils::strings::tokens(const std::string &str) {
+std::vector<std::string> rstore::utils::strings::tokens(const std::string &str) {
   std::vector<std::string> tokens;
   std::istringstream iss(str);
   std::copy(std::istream_iterator<std::string>(iss),
@@ -16,7 +16,7 @@ std::vector<std::string> bpstore::utils::strings::tokens(const std::string &str)
   return tokens;
 }
 
-std::vector<std::string> bpstore::utils::strings::split(const std::string &text,
+std::vector<std::string> rstore::utils::strings::split(const std::string &text,
                                                            char sep) {
   auto n = std::count_if(text.begin(), text.end(), [sep](auto c) { return c == sep; });
 
@@ -38,7 +38,7 @@ std::vector<std::string> bpstore::utils::strings::split(const std::string &text,
   return tokens;
 }
 
-std::string bpstore::utils::strings::to_upper(const std::string &text) {
+std::string rstore::utils::strings::to_upper(const std::string &text) {
   std::string converted = text;
 
   std::transform(std::begin(text), std::end(text), std::begin(converted), [](auto c) {
@@ -48,7 +48,7 @@ std::string bpstore::utils::strings::to_upper(const std::string &text) {
   return converted;
 }
 
-std::string bpstore::utils::strings::to_lower(const std::string &text) {
+std::string rstore::utils::strings::to_lower(const std::string &text) {
   std::string converted = text;
 
   std::transform(std::begin(text), std::end(text), std::begin(converted), [](auto c) {
@@ -57,10 +57,10 @@ std::string bpstore::utils::strings::to_lower(const std::string &text) {
   return converted;
 }
 
-std::string bpstore::utils::strings::inner::to_string(const char *_Val) {
+std::string rstore::utils::strings::inner::to_string(const char *_Val) {
   return std::string(_Val);
 }
 
-std::string bpstore::utils::strings::inner::to_string(const std::string &_Val) {
+std::string rstore::utils::strings::inner::to_string(const std::string &_Val) {
   return _Val;
 }

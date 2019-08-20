@@ -1,9 +1,9 @@
 #include <algorithm>
-#include <bpstore/slice.h>
-#include <bpstore/utils/exception.h>
+#include <rstore/slice.h>
+#include <rstore/utils/exception.h>
 #include <cstring>
 
-using namespace bpstore;
+using namespace rstore;
 
 slice_t::slice_t(const slice_t &cp) {
   size = cp.size;

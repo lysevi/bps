@@ -1,21 +1,21 @@
 #pragma once
-#include <bpstore/exports.h>
-#include <bpstore/utils/logger.h>
-#include <bpstore/utils/strings.h>
+#include <rstore/exports.h>
+#include <rstore/utils/logger.h>
+#include <rstore/utils/strings.h>
 #include <stdexcept>
 #include <string>
 
 #define CODE_POS                                                                         \
-  (bpstore::utils::exceptions::codepos(__FILE__, __LINE__, __FUNCTION__))
+  (rstore::utils::exceptions::codepos(__FILE__, __LINE__, __FUNCTION__))
 
 #define MAKE_EXCEPTION(msg)                                                              \
-  bpstore::utils::exceptions::exception_t::create_and_log(CODE_POS, msg)
+  rstore::utils::exceptions::exception_t::create_and_log(CODE_POS, msg)
 // macros, because need CODE_POS
 
 #define THROW_EXCEPTION(...)                                                             \
-  throw bpstore::utils::exceptions::exception_t::create_and_log(CODE_POS, __VA_ARGS__)
+  throw rstore::utils::exceptions::exception_t::create_and_log(CODE_POS, __VA_ARGS__)
 
-namespace bpstore::utils::exceptions {
+namespace rstore::utils::exceptions {
 
 struct codepos {
   const char *_file;
@@ -61,7 +61,7 @@ protected:
 private:
   std::string _msg;
 };
-} // namespace bpstore::utils::exceptions
+} // namespace rstore::utils::exceptions
 
 
 #define NOT_IMPLEMENTED THROW_EXCEPTION("Not implemented");

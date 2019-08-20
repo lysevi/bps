@@ -1,11 +1,11 @@
-#include <bpstore/slice.h>
-#include <bpstore/slice_helpers.h>
+#include <rstore/slice.h>
+#include <rstore/slice_helpers.h>
 
 #include "helpers.h"
 #include <catch.hpp>
 
 TEMPLATE_TEST_CASE("storage.slice_t", "[store]", size_t, uint32_t, uint64_t) {
-  using namespace bpstore;
+  using namespace rstore;
   for (TestType i = 1; i < 10; ++i) {
     auto slc = slice_make_from(i, sizeof(i));
     EXPECT_EQ(static_cast<TestType>(slc.size), sizeof(i));

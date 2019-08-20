@@ -1,9 +1,9 @@
 #pragma once
-#include <bpstore/exports.h>
+#include <rstore/exports.h>
 
 #include <cstdint>
 
-namespace bpstore {
+namespace rstore {
 using slice_size_t = uint32_t;
 struct slice_t {
   slice_size_t size;
