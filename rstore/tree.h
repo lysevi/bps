@@ -15,9 +15,8 @@ struct MemLevel {
   EXPORT MemLevel(size_t B);
   EXPORT bool insert(Slice &&k, Slice &&v);
   EXPORT std::optional<Slice> find(const Slice &k) const;
-
-  std::vector<Slice> _keys;
-  std::vector<Slice> _vals;
+  EXPORT void sort();
+  std::vector<std::pair<Slice, Slice>> _kv;
   const size_t _cap;
   size_t _size;
 };
@@ -32,6 +31,8 @@ public:
   };
   EXPORT Tree(const Params &p);
   EXPORT void init();
+  EXPORT void insert(Slice &&k, Slice &&v);
+  EXPORT std::optional<Slice> find(const Slice &k) const;
 
 protected:
   Params _params;

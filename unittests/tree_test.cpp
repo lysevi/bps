@@ -12,19 +12,28 @@ TEST_CASE("tree.memlevel", "[store]") {
   auto lvl = std::make_shared<rstore::inner::MemLevel>(B);
   EXPECT_EQ(lvl->_cap, B);
   EXPECT_EQ(lvl->_size, size_t(0));
-  EXPECT_EQ(lvl->_keys.size(), B);
-  EXPECT_EQ(lvl->_vals.size(), B);
+  EXPECT_EQ(lvl->_kv.size(), B);
 
-  size_t k = 0;
-  size_t v = 0;
+  size_t k = 1000;
+  size_t v = 1000;
   while (lvl->insert(rstore::slice_make_from(k), rstore::slice_make_from(v))) {
     auto answer = lvl->find(rstore::slice_make_from(k));
     EXPECT_TRUE(answer.has_value());
     const auto unpacked = rstore::slice_convert_to<size_t>(answer.value());
     EXPECT_EQ(unpacked, v);
-    ++k;
+    --k;
     v += size_t(2);
   }
+
+  lvl->sort();
+  auto k1 = lvl->_kv.front().first;
+  auto k2 = lvl->_kv.back().first;
+
+  auto k1_v = rstore::slice_convert_to<size_t>(lvl->find(k1).value());
+  auto k2_v = rstore::slice_convert_to<size_t>(lvl->find(k2).value());
+
+  EXPECT_LT(k1.compare(k2), 0);
+  EXPECT_GT(k1_v, k2_v);
 }
 
 TEST_CASE("tree", "[store]") {
@@ -35,4 +44,19 @@ TEST_CASE("tree", "[store]") {
 
   rstore::Tree t(params);
   t.init();
+
+  size_t k = 0;
+  size_t v = 0;
+  for (size_t i = 0; i < params.B; ++i) {
+    t.insert(rstore::slice_make_from(k), rstore::slice_make_from(v));
+
+    auto answer = t.find(rstore::slice_make_from(k));
+    EXPECT_TRUE(answer.has_value());
+    const auto unpacked = rstore::slice_convert_to<size_t>(answer.value());
+    EXPECT_EQ(unpacked, v);
+    ++k;
+    v += size_t(2);
+  }
+
+  t.insert(rstore::slice_make_from(k), rstore::slice_make_from(v));
 }
