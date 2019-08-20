@@ -40,13 +40,13 @@ TEST_CASE("utils.to_lower") {
 }
 
 void f_throw() {
-  throw rstore::utils::exceptions::exception_t("error");
+  throw rstore::utils::exceptions::Exception("error");
 }
 
 TEST_CASE("utils.exception") {
   try {
     f_throw();
-  } catch (rstore::utils::exceptions::exception_t &e) {
+  } catch (rstore::utils::exceptions::Exception &e) {
     rstore::utils::logging::logger_info(e.what());
   }
 }

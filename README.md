@@ -20,7 +20,7 @@
             dev branch
         </td>
         <td>
-            Linux <a href="https://travis-ci.org/lysevi/rstore.svg?branch=dev"><img src="https://travis-ci.org/lysevi/rstore.svg?branch=dev""></a>
+            Linux <a href="https://travis-ci.org/lysevi/rstore"><img src="https://travis-ci.org/lysevi/rstore.svg?branch=dev""></a>
         </td>
         <td>
             <a href="https://coveralls.io/github/lysevi/rstore?branch=dev"><img src="https://coveralls.io/repos/github/lysevi/bps/badge.svg?branch=dev"></a>

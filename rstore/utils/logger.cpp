@@ -8,49 +8,49 @@
 
 using namespace rstore::utils::logging;
 
-std::shared_ptr<logger_manager> logger_manager::_instance = nullptr;
-std::mutex logger_manager::_locker;
+std::shared_ptr<LoggerManager> LoggerManager::_instance = nullptr;
+std::mutex LoggerManager::_locker;
 
-VERBOSE_KIND logger_manager::verbose = VERBOSE_KIND::debug;
+VERBOSE_KIND LoggerManager::verbose = VERBOSE_KIND::debug;
 
-void logger_manager::start(abstract_logger_ptr &logger) {
+void LoggerManager::start(AbstractLoggerPtr &logger) {
   if (_instance == nullptr) {
-    _instance = std::shared_ptr<logger_manager>{new logger_manager(logger)};
+    _instance = std::shared_ptr<LoggerManager>{new LoggerManager(logger)};
   }
 }
 
-void logger_manager::stop() {
+void LoggerManager::stop() {
   _instance = nullptr;
 }
 
-logger_manager *logger_manager::instance() noexcept {
+LoggerManager *LoggerManager::instance() noexcept {
   auto tmp = _instance.get();
   if (tmp == nullptr) {
     std::lock_guard lock(_locker);
     tmp = _instance.get();
     if (tmp == nullptr) {
-      abstract_logger_ptr l = std::make_shared<console_logger>();
-      _instance = std::make_shared<logger_manager>(l);
+      AbstractLoggerPtr l = std::make_shared<ConsoleLogger>();
+      _instance = std::make_shared<LoggerManager>(l);
       tmp = _instance.get();
     }
   }
   return tmp;
 }
 
-abstract_logger *logger_manager::get_logger() noexcept {
+AbstractLogger *LoggerManager::get_logger() noexcept {
   return _logger.get();
 }
 
-abstract_logger_ptr logger_manager::get_shared_logger() noexcept {
+AbstractLoggerPtr LoggerManager::get_shared_logger() noexcept {
   return _logger;
 }
 
-logger_manager::logger_manager(abstract_logger_ptr &logger) {
+LoggerManager::LoggerManager(AbstractLoggerPtr &logger) {
   _logger = logger;
 }
 
-void console_logger::message(MESSAGE_KIND kind, const std::string &msg) noexcept {
-  if (logger_manager::verbose == VERBOSE_KIND::quiet) {
+void ConsoleLogger::message(MESSAGE_KIND kind, const std::string &msg) noexcept {
+  if (LoggerManager::verbose == VERBOSE_KIND::quiet) {
     return;
   }
   switch (kind) {
@@ -64,19 +64,19 @@ void console_logger::message(MESSAGE_KIND kind, const std::string &msg) noexcept
     std::cout << "[inf] " << msg << std::endl;
     break;
   case MESSAGE_KIND::message:
-    if (logger_manager::verbose == VERBOSE_KIND::debug) {
+    if (LoggerManager::verbose == VERBOSE_KIND::debug) {
       std::cout << "[dbg] " << msg << std::endl;
     }
     break;
   }
 }
 
-void quiet_logger::message(MESSAGE_KIND kind, const std::string &msg) noexcept {
+void QuietLogger::message(MESSAGE_KIND kind, const std::string &msg) noexcept {
   UNUSED(kind);
   UNUSED(msg);
 }
 
-file_logger::file_logger(std::string fname, bool verbose) {
+FileLogger::FileLogger(std::string fname, bool verbose) {
   _verbose = verbose;
 
   std::stringstream fname_ss;
@@ -91,7 +91,7 @@ file_logger::file_logger(std::string fname, bool verbose) {
   (*_output) << "Start programm" << std::endl;
 }
 
-void file_logger::message(MESSAGE_KIND kind, const std::string &msg) noexcept {
+void FileLogger::message(MESSAGE_KIND kind, const std::string &msg) noexcept {
   std::lock_guard lg(_locker);
 
   std::stringstream ss;
