@@ -17,18 +17,15 @@ T slice_convert_to(const Slice &sl) {
 }
 
 template <typename T>
-static Slice slice_make_from(const T &v, const slice_size_t s) {
+static Slice slice_make_from(const T *v, const slice_size_t s) {
   static_assert(std::is_pod_v<T>);
 
-  auto buf = new uint8_t[s];
-  std::memcpy(buf, &v, s);
-
-  return Slice(s, buf);
+  return Slice{s, reinterpret_cast<const char *>(v)};
 }
 
 template <typename T>
-static std::enable_if_t<std::is_pod_v<T>, Slice> slice_make_from(const T &v) {
-  auto s = sizeof(v);
+static std::enable_if_t<std::is_pod_v<T>, Slice> slice_make_from(const T *v) {
+  auto s = sizeof(T);
   return slice_make_from(v, static_cast<slice_size_t>(s));
 }
 } // namespace rstore
