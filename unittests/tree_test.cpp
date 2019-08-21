@@ -44,7 +44,7 @@ TEST_CASE("tree.kmerge", "[store]") {
   src.reserve(count * 2);
   size_t k = 0;
   for (size_t i = 0; i < count; ++i) {
-    auto cur_size = 3;
+    size_t cur_size = 3;
     auto mem_l = new rstore::inner::MemLevel(cur_size);
     auto low_l = new rstore::inner::LowLevel(cur_size);
 
