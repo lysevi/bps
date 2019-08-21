@@ -3,6 +3,7 @@
 #include <iostream>
 #include <rstore/slice_helpers.h>
 #include <rstore/tree.h>
+#include <rstore/levels.h>
 
 TEST_CASE("tree.memlevel", "[store]") {
   size_t B = 0;
