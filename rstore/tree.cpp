@@ -166,7 +166,7 @@ void Tree::insert(Slice &&k, Slice &&v) {
     inner::kmerge(merge_target.get(), to_merge);
 
     this->_memory_level->clear();
-    for (auto i = 0; i < out_lvl; ++i) {
+    for (size_t i = 0; i < out_lvl; ++i) {
       _levels[i]->clear();
     }
 
