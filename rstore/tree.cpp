@@ -72,19 +72,19 @@ bool LowLevel::insert(Slice &&k, Slice &&v) {
 }
 
 std::optional<Slice> LowLevel::find(const Slice &k) const {
-  // auto low = std::lower_bound(
-  //    _keys.begin(), _keys.end(), [this](const auto &k1, const auto &k2) {
-  //      return k1->compare(*k2) < 0;
-  //    });
+  auto low = std::lower_bound(
+      _keys.begin(), _keys.end(), k, [this](const auto &k1, const auto &k2) {
+        return k1.compare(k2) < 0;
+      });
 
-  // auto upper = std::lower_bound(
-  //    _keys.begin(), _keys.end(), [this](const auto &k1, const auto &k2) {
-  //      return k1->compare(*k2) < 0;
-  //    });
+  auto upper = std::upper_bound(
+      _keys.begin(), _keys.end(), k, [this](const auto &k1, const auto &k2) {
+        return k1.compare(k2) < 0;
+      });
 
-  for (size_t i = 0; i < _size; ++i) {
-    if (k.compare(_keys[i]) == 0) {
-      return _vals[i];
+  for (auto it = low; it != upper; ++it) {
+    if (k.compare(*it) == 0) {
+      return _vals[std::distance(_keys.begin(), it)];
     }
   }
   return {};
@@ -104,7 +104,7 @@ void kmerge(LowLevel *dest, std::vector<INode *> src) {
     auto it = src.begin();
     auto with_max_index_it = it;
     for (auto pos_it = poses.begin(); pos_it != poses.end(); ++pos_it) {
-      if (max_val.first->compare(*(*it)->at(*pos_it).first) <= 0) {
+      if (max_val.first->compare(*(*it)->at(*pos_it).first) >= 0) {
         with_max_index = pos_it;
         max_val = (*it)->at(*pos_it);
         with_max_index_it = it;
@@ -156,11 +156,10 @@ void Tree::insert(Slice &&k, Slice &&v) {
     }
 
     auto merge_target = _levels[out_lvl];
-    std::vector<inner::INode *> to_merge;
-    to_merge.reserve(_levels.size());
-    to_merge.push_back(_memory_level.get());
+    std::vector<inner::INode *> to_merge(out_lvl + 1);
+    to_merge[0] = _memory_level.get();
     for (size_t i = 0; i < out_lvl; ++i) {
-      to_merge.push_back(_levels[i].get());
+      to_merge[i + 1] = _levels[i].get();
     }
 
     inner::kmerge(merge_target.get(), to_merge);

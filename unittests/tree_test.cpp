@@ -1,5 +1,6 @@
 #include "helpers.h"
 #include <catch.hpp>
+#include <iostream>
 #include <rstore/slice_helpers.h>
 #include <rstore/tree.h>
 
@@ -43,7 +44,7 @@ TEST_CASE("tree.kmerge", "[store]") {
   src.reserve(count * 2);
   size_t k = 0;
   for (size_t i = 0; i < count; ++i) {
-    auto cur_size = i + 1;
+    auto cur_size = 3;
     auto mem_l = new rstore::inner::MemLevel(cur_size);
     auto low_l = new rstore::inner::LowLevel(cur_size);
 
@@ -53,7 +54,7 @@ TEST_CASE("tree.kmerge", "[store]") {
       low_l->insert(rstore::slice_make_from(k), rstore::slice_make_from(k * 10));
       k++;
     }
-
+    mem_l->sort();
     src.push_back(mem_l);
     src.push_back(low_l);
   }
@@ -66,6 +67,18 @@ TEST_CASE("tree.kmerge", "[store]") {
   auto dest = std::make_shared<rstore::inner::LowLevel>(total_size);
 
   rstore::inner::kmerge(dest.get(), src);
+
+  for (auto it = dest->_keys.begin(); it != dest->_keys.end(); ++it) {
+    auto k1 = rstore::slice_convert_to<size_t>(*it);
+    auto next = std::next(it);
+    if (next == dest->_keys.end()) {
+      break;
+    }
+    for (auto subit = next; subit != dest->_keys.end(); ++subit) {
+      auto k2 = rstore::slice_convert_to<size_t>(*subit);
+      EXPECT_LE(k1, k2);
+    }
+  }
 
   for (size_t target_key = 0; target_key < k; ++target_key) {
     auto answer = dest->find(rstore::slice_make_from(target_key));
