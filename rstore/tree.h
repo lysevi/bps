@@ -13,7 +13,7 @@ namespace rstore {
 
 namespace inner {
 struct INode {
-  virtual ~INode(){};
+  virtual ~INode(){}
   virtual bool insert(Slice &&k, Slice &&v) = 0;
   virtual size_t size() const = 0;
   virtual std::pair<Slice *, Slice *> at(size_t s) = 0;
@@ -21,7 +21,6 @@ struct INode {
 
 struct MemLevel : public INode {
   EXPORT MemLevel(size_t B);
-  ~MemLevel() {}
   EXPORT bool insert(Slice &&k, Slice &&v) override;
   EXPORT std::optional<Slice> find(const Slice &k) const;
   EXPORT void sort();
@@ -38,7 +37,6 @@ struct MemLevel : public INode {
 
 struct LowLevel : public INode {
   EXPORT LowLevel(size_t B);
-  ~LowLevel() {}
   EXPORT bool insert(Slice &&k, Slice &&v) override;
   EXPORT std::optional<Slice> find(const Slice &k) const;
 

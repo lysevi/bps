@@ -64,7 +64,7 @@ LowLevel::LowLevel(size_t B)
     , _size(0) {}
 
 bool LowLevel::insert(Slice &&k, Slice &&v) {
-  ENSURE(_cap < _size);
+  ENSURE(_cap > _size);
   _keys[_size] = std::move(k);
   _vals[_size] = std::move(v);
   ++_size;
