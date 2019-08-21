@@ -127,7 +127,9 @@ void kmerge(LowLevel *dest, std::vector<INode *> src) {
 } // namespace rstore::inner
 
 Tree::Tree(const Params &p)
-    : _params(p) {}
+    : _params(p) {
+  _merge_iteration = 0;
+}
 
 void Tree::init() {
   _memory_level = std::make_shared<inner::MemLevel>(_params.B);
@@ -142,67 +144,53 @@ size_t block_in_level(size_t lev_num) {
   return (size_t(1) << lev_num);
 }
 
-//
-// template <class T, class Out, class comparer_t>
-// void k_merge(std::list<T> new_values, Out &out, comparer_t comparer) {
-//  auto vals_size = new_values.size();
-//  std::list<size_t> poses;
-//  for (size_t i = 0; i < vals_size; ++i) {
-//    poses.push_back(0);
-//  }
-//  while (!new_values.empty()) {
-//    // get cur max;
-//    auto with_max_index = poses.begin();
-//    auto max_val = new_values.front()->at(*with_max_index);
-//    auto it = new_values.begin();
-//    auto with_max_index_it = it;
-//    for (auto pos_it = poses.begin(); pos_it != poses.end(); ++pos_it) {
-//      if (!comparer(max_val, (*it)->at(*pos_it))) {
-//        with_max_index = pos_it;
-//        max_val = (*it)->at(*pos_it);
-//        with_max_index_it = it;
-//      }
-//      ++it;
-//    }
-//
-//    auto val = (*with_max_index_it)->at(*with_max_index);
-//    if (out->size() == 0 || out->back() != val) {
-//      out.push_back(val);
-//    }
-//    // remove ended in-list
-//    (*with_max_index)++;
-//    if ((*with_max_index) >= (*with_max_index_it)->size()) {
-//      poses.erase(with_max_index);
-//      new_values.erase(with_max_index_it);
-//    }
-//  }
-//}
-
 void Tree::insert(Slice &&k, Slice &&v) {
   if (_memory_level->insert(std::move(k), std::move(v))) {
     return;
   } else {
     _memory_level->sort();
-    auto out_lvl = calc_outlevel_num(_levels.size());
-    if (_levels.size() < out_lvl || _levels.empty()) {
+    auto out_lvl = calc_outlevel_num(_merge_iteration);
+    if (_levels.size() <= out_lvl) {
       _levels.push_back(
           std::make_shared<inner::LowLevel>(block_in_level(out_lvl) * _params.B));
     }
 
-    /*auto merge_target = _levels[out_lvl];
-    std::list<inner::MemLevelPtr> to_merge;
-    to_merge.push_back(_memory_level);
+    auto merge_target = _levels[out_lvl];
+    std::vector<inner::INode *> to_merge;
+    to_merge.reserve(_levels.size());
+    to_merge.push_back(_memory_level.get());
     for (size_t i = 0; i < out_lvl; ++i) {
-      to_merge.push_back(_levels[i]);
-    }*/
+      to_merge.push_back(_levels[i].get());
+    }
 
-    /*k_merge(to_merge, merge_target, [](const Slice &s1, const Slice &s2) {
-      return s1.compare(s2) > 0;
-    });*/
+    inner::kmerge(merge_target.get(), to_merge);
+
+    this->_memory_level->clear();
+    for (auto i = 0; i < out_lvl; ++i) {
+      _levels[i]->clear();
+    }
+
+    _memory_level->insert(std::move(k), std::move(v));
+    _merge_iteration++;
     return;
   }
 }
 
 std::optional<Slice> Tree::find(const Slice &k) const {
-  return _memory_level->find(k);
+  if (!_memory_level->empty()) {
+    auto answer = _memory_level->find(k);
+    if (answer.has_value()) {
+      return answer;
+    }
+  }
+
+  for (const auto &l : _levels) {
+    if (!l->empty()) {
+      auto answer = l->find(k);
+      if (answer.has_value()) {
+        return answer;
+      }
+    }
+  }
+  return {};
 }

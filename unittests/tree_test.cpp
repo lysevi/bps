@@ -90,9 +90,8 @@ TEST_CASE("tree", "[store]") {
 
   size_t k = 0;
   size_t v = 0;
-  for (size_t i = 0; i < params.B; ++i) {
+  while (t.deep() < 7) {
     t.insert(rstore::slice_make_from(k), rstore::slice_make_from(v));
-
     auto answer = t.find(rstore::slice_make_from(k));
     EXPECT_TRUE(answer.has_value());
     const auto unpacked = rstore::slice_convert_to<size_t>(answer.value());
@@ -100,6 +99,4 @@ TEST_CASE("tree", "[store]") {
     ++k;
     v += size_t(2);
   }
-
-  t.insert(rstore::slice_make_from(k), rstore::slice_make_from(v));
 }
