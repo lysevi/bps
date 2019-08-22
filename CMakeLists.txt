@@ -85,6 +85,14 @@ else()
 MESSAGE(STATUS "Standart build folders.")
 endif()
 
+#### cxxopts
+if (rstore_ENABLE_BENCHMARKS)
+	SET(CXXOPTS_BUILD_TESTS CACHE BOOL OFF FORCE)
+	SET(CXXOPTS_BUILD_EXAMPLES  CACHE BOOL OFF FORCE)
+	add_subdirectory(extern/cxxopts)
+	include_directories(extern/cxxopts/include)
+endif (rstore_ENABLE_BENCHMARKS)
+
 ########## BOOST
 IF(NOT HEADER_ONLY)
     list(FIND CONAN_DEFINES_BOOST "-DBOOST_USE_STATIC_LIBS" IS_STATIC)
@@ -124,3 +132,8 @@ if (rstore_ENABLE_TESTS)
   enable_testing()
   add_subdirectory(unittests)
 endif()
+
+
+if (rstore_ENABLE_BENCHMARKS)
+	add_subdirectory(benchmarks)
+endif (rstore_ENABLE_BENCHMARKS)
