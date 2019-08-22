@@ -1,6 +1,6 @@
 #include <rstore/bloom.h>
 
-namespace rstore {
+namespace rstore::inner {
 
 uint64_t jenkins_one_at_a_time_hash(uint8_t *key, size_t len) {
   uint64_t hash, i;
@@ -15,9 +15,8 @@ uint64_t jenkins_one_at_a_time_hash(uint8_t *key, size_t len) {
   return hash;
 }
 
-Bloom::Bloom(bool *fltr_, size_t size_)
-    : fltr(fltr_)
-    , s(size_) {
+Bloom::Bloom(std::vector<bool> &fltr_)
+    : fltr(fltr_) {
   functions = {[](uint8_t *data, size_t data_size) {
                  return jenkins_one_at_a_time_hash(data, data_size);
                },
@@ -34,18 +33,18 @@ Bloom::Bloom(bool *fltr_, size_t size_)
 void Bloom::add(uint8_t *data, size_t data_size) {
   for (const auto &f : functions) {
     auto h = f(data, data_size);
-    fltr[h % s] = true;
+    fltr[h % fltr.size()] = true;
   }
 }
 
 bool Bloom::find(uint8_t *data, size_t data_size) const {
   for (auto &f : functions) {
     auto h = f(data, data_size);
-    if (fltr[h % s] == false) {
+    if (fltr[h % fltr.size()] == false) {
       return false;
     }
   }
   return true;
 }
 
-} // namespace rstore
+} // namespace rstore::inner

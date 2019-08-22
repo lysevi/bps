@@ -1,9 +1,9 @@
 #include "helpers.h"
 #include <catch.hpp>
 #include <iostream>
+#include <rstore/levels.h>
 #include <rstore/slice_helpers.h>
 #include <rstore/tree.h>
-#include <rstore/levels.h>
 
 TEST_CASE("tree.memlevel", "[store]") {
   size_t B = 0;
@@ -47,7 +47,7 @@ TEST_CASE("tree.kmerge", "[store]") {
   for (size_t i = 0; i < count; ++i) {
     size_t cur_size = 3;
     auto mem_l = new rstore::inner::MemLevel(cur_size);
-    auto low_l = new rstore::inner::LowLevel(cur_size);
+    auto low_l = new rstore::inner::LowLevel(cur_size, cur_size);
 
     for (size_t j = 0; j < cur_size; ++j) {
       mem_l->insert(rstore::slice_make_from(k), rstore::slice_make_from(k * 10));
@@ -65,7 +65,7 @@ TEST_CASE("tree.kmerge", "[store]") {
         return r + n->size();
       });
 
-  auto dest = std::make_shared<rstore::inner::LowLevel>(total_size);
+  auto dest = std::make_shared<rstore::inner::LowLevel>(total_size, total_size);
 
   rstore::inner::kmerge(dest.get(), src);
 

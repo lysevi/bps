@@ -1,5 +1,6 @@
 #include <rstore/levels.h>
 
+#include <rstore/bloom.h>
 #include <rstore/utils/exception.h>
 #include <rstore/utils/utils.h>
 
@@ -56,25 +57,42 @@ void MemLevel::sort() {
   _vals = std::move(vals);
 }
 
-LowLevel::LowLevel(size_t B)
+LowLevel::LowLevel(size_t B, size_t bloom_size)
     : _keys(B)
     , _vals(B)
+    , bloom_fltr_data(bloom_size)
     , _cap(B)
-    , _size(0) {}
+    , _size(0) {
+  bl = std::make_unique<Bloom>(bloom_fltr_data);
+}
+
+void LowLevel::update_header() {
+  for (const auto &k : _keys) {
+    bl->add(k.data, k.size);
+  }
+}
 
 bool LowLevel::insert(Slice &&k, Slice &&v) {
   ENSURE(_cap > _size);
   _keys[_size] = std::move(k);
   _vals[_size] = std::move(v);
+  bl->add(k.data, k.size);
   ++_size;
   return true;
 }
 
 std::optional<Slice> LowLevel::find(const Slice &k) const {
+  if (!bl->find(k.data, k.size)) {
+    return {};
+  }
   auto low = std::lower_bound(
       _keys.begin(), _keys.end(), k, [](const auto &k1, const auto &k2) {
         return k1.compare(k2) < 0;
       });
+
+  if (low == _keys.end()) {
+    return {};
+  }
 
   auto upper = std::upper_bound(
       _keys.begin(), _keys.end(), k, [](const auto &k1, const auto &k2) {
@@ -122,6 +140,7 @@ void kmerge(LowLevel *dest, std::vector<INode *> src) {
       src.erase(with_max_index_it);
     }
   }
+  dest->update_header();
 }
 
 } // namespace rstore::inner

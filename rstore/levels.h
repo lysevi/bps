@@ -12,6 +12,8 @@
 #include <vector>
 
 namespace rstore::inner {
+struct Bloom;
+
 struct INode {
   virtual ~INode() {}
   virtual bool insert(Slice &&k, Slice &&v) = 0;
@@ -47,7 +49,7 @@ struct MemLevel : public INode {
 };
 
 struct LowLevel : public INode {
-  EXPORT LowLevel(size_t B);
+  EXPORT LowLevel(size_t B, size_t bloom_size);
   EXPORT bool insert(Slice &&k, Slice &&v) override;
   EXPORT std::optional<Slice> find(const Slice &k) const;
 
@@ -77,8 +79,12 @@ struct LowLevel : public INode {
     _size++;
   }
   bool empty() const override { return _size == 0; }
+
+  void update_header();
   std::vector<Slice> _keys;
   std::vector<Slice> _vals;
+  std::vector<bool> bloom_fltr_data;
+  std::unique_ptr<Bloom> bl;
   const size_t _cap;
   size_t _size;
 };

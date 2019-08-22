@@ -22,7 +22,8 @@ using LowLevelPtr = std::shared_ptr<LowLevel>;
 class Tree {
 public:
   struct Params {
-    size_t B;
+    size_t B = 10;
+    size_t BloomSize = 10;
   };
   EXPORT Tree(const Params &p);
   EXPORT void init();

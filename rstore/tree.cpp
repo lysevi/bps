@@ -1,5 +1,5 @@
-#include <rstore/tree.h>
 #include <rstore/levels.h>
+#include <rstore/tree.h>
 #include <rstore/utils/cz.h>
 #include <rstore/utils/exception.h>
 #include <rstore/utils/utils.h>
@@ -35,8 +35,8 @@ void Tree::insert(Slice &&k, Slice &&v) {
     _memory_level->sort();
     auto out_lvl = calc_outlevel_num(_merge_iteration);
     if (_levels.size() <= out_lvl) {
-      _levels.push_back(
-          std::make_shared<inner::LowLevel>(block_in_level(out_lvl) * _params.B));
+      _levels.push_back(std::make_shared<inner::LowLevel>(
+          block_in_level(out_lvl) * _params.B, _params.BloomSize));
     }
 
     auto merge_target = _levels[out_lvl];
