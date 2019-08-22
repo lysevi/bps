@@ -24,7 +24,7 @@ configuration:
   - Release
 
 build:
-  project: build\solidarity.sln
+  project: build\rstore.sln
   parallel: true               
   verbosity: normal 
 
