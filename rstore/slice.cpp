@@ -43,12 +43,11 @@ void Slice::operator=(Slice &&cp) {
   std::swap(cp.size, size);
 }
 
-
 int Slice::compare(const Slice &o) const {
   ENSURE(data != nullptr);
   ENSURE(o.data != nullptr);
   const uint32_t minimal_size = std::min(size, o.size);
-  int result = std::memcmp(data, o.data, minimal_size);
+  const int result = std::memcmp(data, o.data, minimal_size);
   if (result == 0) {
     if (size < o.size) {
       return -1;
