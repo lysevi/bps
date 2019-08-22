@@ -61,14 +61,13 @@ LowLevel::LowLevel(size_t B, size_t bloom_size)
     : _keys(B)
     , _vals(B)
     , bloom_fltr_data(bloom_size)
+    , bl(bloom_fltr_data)
     , _cap(B)
-    , _size(0) {
-  bl = std::make_unique<Bloom>(bloom_fltr_data);
-}
+    , _size(0) {}
 
 void LowLevel::update_header() {
   for (const auto &k : _keys) {
-    bl->add(k.data, k.size);
+    bl.add(k.data, k.size);
   }
 }
 
@@ -76,13 +75,13 @@ bool LowLevel::insert(Slice &&k, Slice &&v) {
   ENSURE(_cap > _size);
   _keys[_size] = std::move(k);
   _vals[_size] = std::move(v);
-  bl->add(k.data, k.size);
+  bl.add(k.data, k.size);
   ++_size;
   return true;
 }
 
 std::optional<Slice> LowLevel::find(const Slice &k) const {
-  if (!bl->find(k.data, k.size)) {
+  if (!bl.find(k.data, k.size)) {
     return {};
   }
   auto low = std::lower_bound(

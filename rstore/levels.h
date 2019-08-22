@@ -4,6 +4,7 @@
 
 #include <rstore/exports.h>
 #include <rstore/slice.h>
+#include <rstore/bloom.h>
 #include <rstore/utils/exception.h>
 
 #include <cstdint>
@@ -12,7 +13,6 @@
 #include <vector>
 
 namespace rstore::inner {
-struct Bloom;
 
 struct INode {
   virtual ~INode() {}
@@ -84,7 +84,7 @@ struct LowLevel : public INode {
   std::vector<Slice> _keys;
   std::vector<Slice> _vals;
   std::vector<bool> bloom_fltr_data;
-  std::unique_ptr<Bloom> bl;
+  Bloom bl;
   const size_t _cap;
   size_t _size;
 };
