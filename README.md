@@ -9,7 +9,7 @@
             Linux <a href="https://travis-ci.org/lysevi/rstore"><img src="https://travis-ci.org/lysevi/rstore.svg?branch=master""></a>
         </td>
         <td>
-            Windows <a href="https://ci.appveyor.com/project/lysevi/rstore/branch/master"><img src="https://ci.appveyor.com/api/projects/status/w9m51aqkn4f9tpp2/branch/master?svg=true"></a>
+            Windows <a href="https://ci.appveyor.com/project/lysevi/rstore/branch/master"><img src="https://ci.appveyor.com/api/projects/status/2af9klradtpcj6b3/branch/master?svg=true"></a>
         </td>
         <td>
             <a href="https://coveralls.io/github/lysevi/rstore?branch=master"><img src="https://coveralls.io/repos/github/lysevi/bps/badge.svg?branch=master"></a>
@@ -26,7 +26,7 @@
             Linux <a href="https://travis-ci.org/lysevi/rstore"><img src="https://travis-ci.org/lysevi/rstore.svg?branch=dev""></a>
         </td>
         <td>
-            Windows <a href="https://ci.appveyor.com/project/lysevi/rstore/branch/dev"><img src="https://ci.appveyor.com/api/projects/status/w9m51aqkn4f9tpp2/branch/dev?svg=true"></a>
+            Windows <a href="https://ci.appveyor.com/project/lysevi/rstore/branch/dev"><img src="https://ci.appveyor.com/api/projects/status/2af9klradtpcj6b3/branch/dev?svg=true"></a>
         </td>
         <td>
             <a href="https://coveralls.io/github/lysevi/rstore?branch=dev"><img src="https://coveralls.io/repos/github/lysevi/bps/badge.svg?branch=dev"></a>
