@@ -36,14 +36,17 @@ void Tree::insert(Slice &&k, Slice &&v) {
     auto out_lvl = calc_outlevel_num(_merge_iteration);
     if (_levels.size() <= out_lvl) {
       _levels.push_back(std::make_shared<inner::LowLevel>(
-          block_in_level(out_lvl) * _params.B, _params.BloomSize));
+          out_lvl, block_in_level(out_lvl) * _params.B, _params.BloomSize));
     }
 
     auto merge_target = _levels[out_lvl];
+    _memory_level->clear_link();
     std::vector<inner::INode *> to_merge(out_lvl + 1);
     to_merge[0] = _memory_level.get();
     for (size_t i = 0; i < out_lvl; ++i) {
-      to_merge[i + 1] = _levels[i].get();
+      auto ptr = _levels[i].get();
+      ptr->clear_link();
+      to_merge[i + 1] = ptr;
     }
 
     inner::kmerge(merge_target.get(), to_merge);
@@ -60,18 +63,49 @@ void Tree::insert(Slice &&k, Slice &&v) {
 }
 
 std::optional<Slice> Tree::find(const Slice &k) const {
+  std::optional<Slice> result;
+  std::optional<inner::Link> target_lvl;
+  auto answer_clbk = [&](auto &&arg) {
+    using T = std::decay_t<decltype(arg)>;
+    if constexpr (std::is_same_v<T, Slice>) {
+      result = arg;
+    }
+    if constexpr (std::is_same_v<T, inner::Link>) {
+      target_lvl = arg;
+    }
+    if constexpr (std::is_same_v<T, bool>) {
+    }
+  };
+
   if (!_memory_level->empty()) {
     auto answer = _memory_level->find(k);
-    if (answer.has_value()) {
-      return answer;
-    }
+
+    std::visit(answer_clbk, answer);
+  }
+
+  if (result.has_value()) {
+    return result;
+  }
+
+  if (target_lvl.has_value()) {
+    auto link = target_lvl.value();
+    auto l = _levels[link.lvl];
+    return l->find(k, link.pos);
   }
 
   for (const auto &l : _levels) {
     if (!l->empty()) {
       auto answer = l->find(k);
-      if (answer.has_value()) {
-        return answer;
+      std::visit(answer_clbk, answer);
+
+      if (result.has_value()) {
+        return result;
+      }
+
+      if (target_lvl.has_value()) {
+        auto link = target_lvl.value();
+        auto lvl = _levels[link.lvl];
+        return lvl->find(k, link.pos);
       }
     }
   }

@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <iterator>
 #include <list>
 #include <numeric>
 
@@ -14,6 +15,7 @@ MemLevel::MemLevel(size_t B)
     : _keys(B)
     , _vals(B)
     , _cap(B)
+    , _links(B)
     , _size(0) {}
 
 bool MemLevel::insert(Slice &&k, Slice &&v) {
@@ -26,13 +28,19 @@ bool MemLevel::insert(Slice &&k, Slice &&v) {
   return true;
 }
 
-std::optional<Slice> MemLevel::find(const Slice &k) const {
+std::variant<Slice, Link, bool> MemLevel::find(const Slice &k) const {
   for (size_t i = 0; i < _size; ++i) {
     if (k.compare(_keys[i]) == 0) {
       return _vals[i];
     }
   }
-  return {};
+  // TODO use binary search
+  for (size_t i = 0; i < _size; ++i) {
+    if (!_links[i].empty() && k.compare(_links[i].key) == 0) {
+      return _links[i];
+    }
+  }
+  return false;
 }
 
 void MemLevel::sort() {
@@ -57,10 +65,12 @@ void MemLevel::sort() {
   _vals = std::move(vals);
 }
 
-LowLevel::LowLevel(size_t B, size_t bloom_size)
-    : _keys(B)
+LowLevel::LowLevel(size_t num, size_t B, size_t bloom_size)
+    : _num(num)
+    , _keys(B)
     , _vals(B)
     , _bloom_fltr(bloom_size)
+    , _links(B)
     , _cap(B)
     , _size(0) {}
 
@@ -79,30 +89,45 @@ bool LowLevel::insert(Slice &&k, Slice &&v) {
   return true;
 }
 
-std::optional<Slice> LowLevel::find(const Slice &k) const {
-  if (!rstore::inner::Bloom::find(_bloom_fltr, k.data, k.size)) {
-    return {};
+Slice LowLevel::find(const Slice &k, size_t pos) const {
+  auto it = _keys.cbegin();
+  std::advance(it, pos);
+  for (; it != _keys.cend(); ++it) {
+    if (k.compare(*it) == 0) {
+      return _vals[std::distance(_keys.begin(), it)];
+    }
   }
+  THROW_EXCEPTION("not found");
+}
+
+std::variant<Slice, Link, bool> LowLevel::find(const Slice &k) const {
+  /* if (!rstore::inner::Bloom::find(_bloom_fltr, k.data, k.size)) {
+     return {};
+   }*/
   auto low = std::lower_bound(
       _keys.begin(), _keys.end(), k, [](const auto &k1, const auto &k2) {
         return k1.compare(k2) < 0;
       });
 
-  if (low == _keys.end()) {
-    return {};
-  }
+  if (low != _keys.end()) {
+    auto upper = std::upper_bound(
+        _keys.begin(), _keys.end(), k, [](const auto &k1, const auto &k2) {
+          return k1.compare(k2) < 0;
+        });
 
-  auto upper = std::upper_bound(
-      _keys.begin(), _keys.end(), k, [](const auto &k1, const auto &k2) {
-        return k1.compare(k2) < 0;
-      });
-
-  for (auto it = low; it != upper; ++it) {
-    if (k.compare(*it) == 0) {
-      return _vals[std::distance(_keys.begin(), it)];
+    for (auto it = low; it != upper; ++it) {
+      if (k.compare(*it) == 0) {
+        return _vals[std::distance(_keys.begin(), it)];
+      }
     }
   }
-  return {};
+  // TODO use binary search
+  for (size_t i = 0; i < _size; ++i) {
+    if (!_links[i].empty() && k.compare(_links[i].key) == 0) {
+      return _links[i];
+    }
+  }
+  return false;
 }
 
 void kmerge(LowLevel *dest, std::vector<INode *> src) {
@@ -129,7 +154,8 @@ void kmerge(LowLevel *dest, std::vector<INode *> src) {
 
     auto val = (*with_max_index_it)->at(*with_max_index);
     if (dest->size() == 0 || dest->back() != val) {
-      dest->push_back(val);
+      auto pos = dest->push_back(val);
+      (*with_max_index_it)->add_link(*val.first, pos, dest->_num);
     }
     // remove ended in-list
     (*with_max_index)++;

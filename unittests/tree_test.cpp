@@ -21,8 +21,17 @@ TEST_CASE("tree.memlevel", "[store]") {
   size_t v = 1000;
   while (lvl->insert(rstore::slice_make_from(k), rstore::slice_make_from(v))) {
     auto answer = lvl->find(rstore::slice_make_from(k));
-    EXPECT_TRUE(answer.has_value());
-    const auto unpacked = rstore::slice_convert_to<size_t>(answer.value());
+    std::optional<rstore::Slice> result;
+    auto answer_clbk = [&result](auto &&arg) {
+      using T = std::decay_t<decltype(arg)>;
+      if constexpr (std::is_same_v<T, rstore::Slice>) {
+        result = arg;
+      }
+    };
+    std::visit(answer_clbk, answer);
+
+    EXPECT_TRUE(result.has_value());
+    const auto unpacked = rstore::slice_convert_to<size_t>(result.value());
     EXPECT_EQ(unpacked, v);
     --k;
     v += size_t(2);
@@ -31,9 +40,20 @@ TEST_CASE("tree.memlevel", "[store]") {
   lvl->sort();
   auto k1 = lvl->_keys.front();
   auto k2 = lvl->_keys.back();
+  std::optional<rstore::Slice> result;
+  auto answer_clbk = [&result](auto &&arg) {
+    using T = std::decay_t<decltype(arg)>;
+    if constexpr (std::is_same_v<T, rstore::Slice>) {
+      result = arg;
+    }
+  };
+  auto answer = lvl->find(k1);
+  std::visit(answer_clbk, answer);
 
-  auto k1_v = rstore::slice_convert_to<size_t>(lvl->find(k1).value());
-  auto k2_v = rstore::slice_convert_to<size_t>(lvl->find(k2).value());
+  auto k1_v = rstore::slice_convert_to<size_t>(result.value());
+  answer = lvl->find(k2);
+  std::visit(answer_clbk, answer);
+  auto k2_v = rstore::slice_convert_to<size_t>(result.value());
 
   EXPECT_LT(k1.compare(k2), 0);
   EXPECT_GT(k1_v, k2_v);
@@ -44,10 +64,11 @@ TEST_CASE("tree.kmerge", "[store]") {
   std::vector<rstore::inner::INode *> src;
   src.reserve(count * 2);
   size_t k = 0;
+  size_t num = 0;
   for (size_t i = 0; i < count; ++i) {
     size_t cur_size = 3;
     auto mem_l = new rstore::inner::MemLevel(cur_size);
-    auto low_l = new rstore::inner::LowLevel(cur_size, cur_size);
+    auto low_l = new rstore::inner::LowLevel(num++, cur_size, cur_size);
 
     for (size_t j = 0; j < cur_size; ++j) {
       mem_l->insert(rstore::slice_make_from(k), rstore::slice_make_from(k * 10));
@@ -65,7 +86,7 @@ TEST_CASE("tree.kmerge", "[store]") {
         return r + n->size();
       });
 
-  auto dest = std::make_shared<rstore::inner::LowLevel>(total_size, total_size);
+  auto dest = std::make_shared<rstore::inner::LowLevel>(num++, total_size, total_size);
 
   rstore::inner::kmerge(dest.get(), src);
 
@@ -83,8 +104,16 @@ TEST_CASE("tree.kmerge", "[store]") {
 
   for (size_t target_key = 0; target_key < k; ++target_key) {
     auto answer = dest->find(rstore::slice_make_from(target_key));
-    EXPECT_TRUE(answer.has_value());
-    auto value = rstore::slice_convert_to<size_t>(answer.value());
+    std::optional<rstore::Slice> result;
+    auto answer_clbk = [&result](auto &&arg) {
+      using T = std::decay_t<decltype(arg)>;
+      if constexpr (std::is_same_v<T, rstore::Slice>) {
+        result = arg;
+      }
+    };
+    std::visit(answer_clbk, answer);
+    EXPECT_TRUE(result.has_value());
+    auto value = rstore::slice_convert_to<size_t>(result.value());
     EXPECT_EQ(target_key * 10, value);
   }
 
@@ -103,14 +132,16 @@ TEST_CASE("tree", "[store]") {
   t.init();
 
   size_t k = 0;
-  size_t v = 0;
   while (t.deep() < 7) {
+    size_t v = k + 3;
     t.insert(rstore::slice_make_from(k), rstore::slice_make_from(v));
-    auto answer = t.find(rstore::slice_make_from(k));
+    ++k;
+  }
+
+  for (size_t i = 0; i < k; ++i) {
+    auto answer = t.find(rstore::slice_make_from(i));
     EXPECT_TRUE(answer.has_value());
     const auto unpacked = rstore::slice_convert_to<size_t>(answer.value());
-    EXPECT_EQ(unpacked, v);
-    ++k;
-    v += size_t(2);
+    EXPECT_EQ(unpacked, i + 3);
   }
 }
