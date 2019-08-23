@@ -15,10 +15,9 @@ TEST_CASE("bloom", "[store]") {
 
   std::vector<uint8_t> data(data_size);
 
-  rstore::inner::Bloom blm(fltr);
   for (size_t i = 0; i < data_size; ++i) {
     data[i] = 1;
-    blm.add(data.data(), data.size());
-    EXPECT_TRUE(blm.find(data.data(), data.size()));
+    rstore::inner::Bloom::add(fltr, data.data(), data.size());
+    EXPECT_TRUE(rstore::inner::Bloom::find(fltr, data.data(), data.size()));
   }
 }

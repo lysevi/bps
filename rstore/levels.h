@@ -4,7 +4,6 @@
 
 #include <rstore/exports.h>
 #include <rstore/slice.h>
-#include <rstore/bloom.h>
 #include <rstore/utils/exception.h>
 
 #include <cstdint>
@@ -83,8 +82,7 @@ struct LowLevel : public INode {
   void update_header();
   std::vector<Slice> _keys;
   std::vector<Slice> _vals;
-  std::vector<bool> bloom_fltr_data;
-  Bloom bl;
+  std::vector<bool> _bloom_fltr;
   const size_t _cap;
   size_t _size;
 };
