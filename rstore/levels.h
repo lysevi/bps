@@ -75,7 +75,7 @@ struct LowLevel : public INode {
 
   EXPORT LowLevel(size_t num, size_t B, size_t bloom_size);
   EXPORT bool insert(Slice &&k, Slice &&v) override;
-  EXPORT Slice find(const Slice &k, size_t pos) const;
+  EXPORT Slice at(const Slice &k, size_t pos) const;
   EXPORT std::variant<Slice, Link, bool> find(const Slice &k) const override;
 
   size_t size() const override { return _size; }
