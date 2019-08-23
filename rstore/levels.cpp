@@ -99,28 +99,28 @@ Slice LowLevel::at(const Slice &k, size_t pos) const {
 
 std::variant<Slice, Link, bool> LowLevel::find(const Slice &k) const {
   if (rstore::inner::Bloom::find(_bloom_fltr, k.data, k.size)) {
-    auto low = std::lower_bound(
-        _keys.begin(), _keys.end(), k, [](const auto &k1, const auto &k2) {
-          return k1.compare(k2) < 0;
-        });
+    auto low = std::lower_bound(_keys.begin(),
+                                _keys.end(),
+                                k,
+                                [](const auto &k1, const auto &k2) { return k1 < k2; });
 
     if (low != _keys.end()) {
       auto upper = std::upper_bound(
           _keys.begin(), _keys.end(), k, [](const auto &k1, const auto &k2) {
-            return k1.compare(k2) < 0;
+            return k1 < k2;
           });
 
       for (auto it = low; it != upper; ++it) {
-        if (k.compare(*it) == 0) {
+        if (k == *it) {
           return _vals[std::distance(_keys.begin(), it)];
         }
       }
     }
   }
   // TODO use binary search
-  for (size_t i = 0; i < _size; ++i) {
-    if (!_links[i].empty() && k.compare(_links[i].key) == 0) {
-      return _links[i];
+  for (auto it = _links.cbegin(); it != _links.cend(); ++it) {
+    if (!it->empty() && k == it->key) {
+      return *it;
     }
   }
   return false;
