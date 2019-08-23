@@ -35,7 +35,7 @@ struct INode {
   virtual void add_link(const Slice &k, const size_t pos, const size_t lvl) = 0;
 };
 
-struct MemLevel : public INode {
+struct MemLevel final : public INode {
   EXPORT MemLevel(size_t B);
   EXPORT bool insert(Slice &&k, Slice &&v) override;
   EXPORT std::variant<Slice, Link, bool> find(const Slice &k) const override;
@@ -71,11 +71,11 @@ struct MemLevel : public INode {
   size_t _links_pos = 0;
 };
 
-struct LowLevel : public INode {
+struct LowLevel final : public INode {
 
   EXPORT LowLevel(size_t num, size_t B, size_t bloom_size);
   EXPORT bool insert(Slice &&k, Slice &&v) override;
-  EXPORT Slice at(const Slice &k, size_t pos) const;
+  EXPORT Slice find(const Link &l) const;
   EXPORT std::variant<Slice, Link, bool> find(const Slice &k) const override;
 
   size_t size() const override { return _size; }
@@ -119,7 +119,7 @@ struct LowLevel : public INode {
     return pos;
   }
 
-  bool empty() const override { return _size == 0; }
+  bool empty() const override { return _size == 0 && _links_pos == 0; }
 
   void update_header();
   size_t _num = 0;

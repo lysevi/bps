@@ -90,7 +90,7 @@ std::optional<Slice> Tree::find(const Slice &k) const {
   if (target_lvl.has_value()) {
     auto link = target_lvl.value();
     auto l = _levels[link.lvl];
-    return l->at(k, link.pos);
+    return l->find(link);
   }
 
   for (const auto &l : _levels) {
@@ -105,7 +105,7 @@ std::optional<Slice> Tree::find(const Slice &k) const {
       if (target_lvl.has_value()) {
         auto link = target_lvl.value();
         auto lvl = _levels[link.lvl];
-        return lvl->at(k, link.pos);
+        return lvl->find(link);
       }
     }
   }

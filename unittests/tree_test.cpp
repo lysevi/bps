@@ -137,6 +137,12 @@ TEST_CASE("tree", "[store]") {
     t.insert(rstore::slice_make_from(k), rstore::slice_make_from(v));
     ++k;
   }
+  size_t keys_count = static_cast<size_t>(k / 2.0);
+  for (size_t i = 0; i < keys_count; ++i) {
+    size_t v = k + 3;
+    t.insert(rstore::slice_make_from(k), rstore::slice_make_from(v));
+    ++k;
+  }
 
   for (size_t i = 0; i < k; ++i) {
     auto answer = t.find(rstore::slice_make_from(i));
@@ -144,4 +150,6 @@ TEST_CASE("tree", "[store]") {
     const auto unpacked = rstore::slice_convert_to<size_t>(answer.value());
     EXPECT_EQ(unpacked, i + 3);
   }
+  auto answer = t.find(rstore::slice_make_from(k * 2));
+  EXPECT_FALSE(answer.has_value());
 }
