@@ -14,8 +14,8 @@ namespace rstore::inner {
 MemLevel::MemLevel(size_t B)
     : _keys(B)
     , _vals(B)
-    , _cap(B)
     , _links(B)
+    , _cap(B)
     , _size(0) {}
 
 bool MemLevel::insert(Slice &&k, Slice &&v) {
