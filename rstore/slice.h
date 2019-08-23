@@ -36,5 +36,6 @@ struct Slice {
     }
     size = 0;
   }
+  bool empty() const { return data == nullptr && size == 0; }
 };
 } // namespace rstore
