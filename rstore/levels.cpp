@@ -101,23 +101,22 @@ Slice LowLevel::find(const Slice &k, size_t pos) const {
 }
 
 std::variant<Slice, Link, bool> LowLevel::find(const Slice &k) const {
-  /* if (!rstore::inner::Bloom::find(_bloom_fltr, k.data, k.size)) {
-     return {};
-   }*/
-  auto low = std::lower_bound(
-      _keys.begin(), _keys.end(), k, [](const auto &k1, const auto &k2) {
-        return k1.compare(k2) < 0;
-      });
-
-  if (low != _keys.end()) {
-    auto upper = std::upper_bound(
+  if (rstore::inner::Bloom::find(_bloom_fltr, k.data, k.size)) {
+    auto low = std::lower_bound(
         _keys.begin(), _keys.end(), k, [](const auto &k1, const auto &k2) {
           return k1.compare(k2) < 0;
         });
 
-    for (auto it = low; it != upper; ++it) {
-      if (k.compare(*it) == 0) {
-        return _vals[std::distance(_keys.begin(), it)];
+    if (low != _keys.end()) {
+      auto upper = std::upper_bound(
+          _keys.begin(), _keys.end(), k, [](const auto &k1, const auto &k2) {
+            return k1.compare(k2) < 0;
+          });
+
+      for (auto it = low; it != upper; ++it) {
+        if (k.compare(*it) == 0) {
+          return _vals[std::distance(_keys.begin(), it)];
+        }
       }
     }
   }
