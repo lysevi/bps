@@ -58,20 +58,17 @@ struct MemLevel : public INode {
     for (auto &l : _links) {
       l = Link();
     }
+    _links_pos = 0;
   }
   void add_link(const Slice &k, const size_t pos, const size_t lvl) override {
-    for (size_t i = 0; i < _links.size(); ++i) {
-      if (_links[i].pos == UNKNOW_POS) {
-        _links[i] = Link{k, pos, lvl};
-        break;
-      }
-    }
+    _links[_links_pos++] = Link{k, pos, lvl};
   }
   std::vector<Slice> _keys;
   std::vector<Slice> _vals;
   std::vector<Link> _links;
   const size_t _cap;
   size_t _size;
+  size_t _links_pos = 0;
 };
 
 struct LowLevel : public INode {
@@ -87,12 +84,7 @@ struct LowLevel : public INode {
   }
 
   void add_link(const Slice &k, const size_t pos, const size_t lvl) override {
-    for (size_t i = 0; i < _links.size(); ++i) {
-      if (_links[i].pos == UNKNOW_POS) {
-        _links[i] = Link{k, pos, lvl};
-        break;
-      }
-    }
+    _links[_links_pos++] = Link{k, pos, lvl};
   }
 
   void clear() override {
@@ -108,6 +100,7 @@ struct LowLevel : public INode {
     for (auto &l : _links) {
       l = Link();
     }
+    _links_pos = 0;
   }
 
   std::pair<Slice *, Slice *> back() {
@@ -136,6 +129,7 @@ struct LowLevel : public INode {
   std::vector<Link> _links;
   const size_t _cap;
   size_t _size;
+  size_t _links_pos = 0;
 };
 
 EXPORT void kmerge(LowLevel *dest, std::vector<INode *> src);
