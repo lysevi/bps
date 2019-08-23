@@ -46,6 +46,7 @@ std::variant<Slice, Link, bool> MemLevel::find(const Slice &k) const {
       return _vals[i];
     }
   }
+
   if (_links_pos != 0) {
     // TODO zero allocation
     Link tmp_link;
