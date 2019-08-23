@@ -150,4 +150,6 @@ TEST_CASE("tree", "[store]") {
     const auto unpacked = rstore::slice_convert_to<size_t>(answer.value());
     EXPECT_EQ(unpacked, i + 3);
   }
+  auto answer = t.find(rstore::slice_make_from(k * 2));
+  EXPECT_FALSE(answer.has_value());
 }

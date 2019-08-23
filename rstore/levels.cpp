@@ -89,12 +89,8 @@ bool LowLevel::insert(Slice &&k, Slice &&v) {
   return true;
 }
 
-Slice LowLevel::at(const Slice &k, size_t pos) const {
-#if DOUBLE_CHECKS
-  ENSURE(k.compare(_keys[pos]) == 0);
-#endif
-  UNUSED(k);
-  return _vals.at(pos);
+Slice LowLevel::find(const Link &l) const {
+  return _vals.at(l.pos);
 }
 
 std::variant<Slice, Link, bool> LowLevel::find(const Slice &k) const {
