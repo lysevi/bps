@@ -1,8 +1,8 @@
 #include <rstore/bloom.h>
 
 namespace rstore::inner {
-
-uint64_t jenkins_one_at_a_time_hash(uint8_t *key, size_t len) {
+namespace {
+uint64_t jenkins_hash(uint8_t *key, size_t len) {
   uint64_t hash, i;
   for (hash = i = 0; i < len; ++i) {
     hash += key[i];
@@ -14,32 +14,36 @@ uint64_t jenkins_one_at_a_time_hash(uint8_t *key, size_t len) {
   hash += (hash << 15);
   return hash;
 }
-
-Bloom::Bloom(std::vector<bool> &fltr_)
-    : fltr(fltr_) {
-  functions = {[](uint8_t *data, size_t data_size) {
-                 return jenkins_one_at_a_time_hash(data, data_size);
-               },
-               [](uint8_t *data, size_t data_size) {
-                 std::hash<uint8_t> hasher;
-                 uint64_t result = 0;
-                 for (size_t i = 0; i < data_size; ++i) {
-                   result = (result << 1) ^ hasher(data[i]);
-                 }
-                 return result;
-               }};
+uint64_t std_hasher(uint8_t *data, size_t data_size) {
+  std::hash<uint8_t> hasher;
+  uint64_t result = 0;
+  for (size_t i = 0; i < data_size; ++i) {
+    result = (result << 1) ^ hasher(data[i]);
+  }
+  return result;
 }
+} // namespace
 
-void Bloom::add(uint8_t *data, size_t data_size) {
-  for (const auto &f : functions) {
-    auto h = f(data, data_size);
+void Bloom::add(std::vector<bool> &fltr, uint8_t *data, size_t data_size) {
+  {
+    auto h = jenkins_hash(data, data_size);
+    fltr[h % fltr.size()] = true;
+  }
+  {
+    auto h = std_hasher(data, data_size);
     fltr[h % fltr.size()] = true;
   }
 }
 
-bool Bloom::find(uint8_t *data, size_t data_size) const {
-  for (auto &f : functions) {
-    auto h = f(data, data_size);
+bool Bloom::find(const std::vector<bool> &fltr, uint8_t *data, size_t data_size) {
+  {
+    auto h = jenkins_hash(data, data_size);
+    if (fltr[h % fltr.size()] == false) {
+      return false;
+    }
+  }
+  {
+    auto h = std_hasher(data, data_size);
     if (fltr[h % fltr.size()] == false) {
       return false;
     }
