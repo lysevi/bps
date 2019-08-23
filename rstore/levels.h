@@ -119,7 +119,7 @@ struct LowLevel : public INode {
     return pos;
   }
 
-  bool empty() const override { return _size == 0; }
+  bool empty() const override { return _size == 0 && _links_pos == 0; }
 
   void update_header();
   size_t _num = 0;

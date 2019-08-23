@@ -45,9 +45,20 @@ int main(int argc, char **argv) {
   size_t k = 0;
   size_t v = 0;
   rstore::utils::ElapsedTime write_time;
+  size_t last_deel = t.deep();
   while (t.deep() < deep) {
     t.insert(rstore::slice_make_from(k), rstore::slice_make_from(v));
     t.find(rstore::slice_make_from(k));
+    ++k;
+    v += size_t(2);
+    if (t.deep() != last_deel) {
+      last_deel = t.deep();
+      std::cout << "deep: " << last_deel << std::endl;
+    }
+  }
+  size_t keys_count = static_cast<size_t>(k / 2.0);
+  for (size_t i = 0; i < keys_count; ++i) {
+    t.insert(rstore::slice_make_from(k), rstore::slice_make_from(v));
     ++k;
     v += size_t(2);
   }
