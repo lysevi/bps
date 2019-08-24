@@ -27,6 +27,7 @@ MemLevel::MemLevel(size_t B)
     : _keys(B)
     , _vals(B)
     , _links(B)
+    , _links_bloom_fltr(B)
     , _cap(B)
     , _size(0) {}
 
@@ -48,17 +49,19 @@ std::variant<Slice, Link, bool> MemLevel::find(const Slice &k) const {
   }
 
   if (_links_pos != 0) {
-    // TODO zero allocation
-    Link tmp_link;
-    tmp_link.key = k;
-    auto [low, upper] = bin_search(
-        _links.begin(), _links.end(), tmp_link, [](const auto &k1, const auto &k2) {
-          return k1.key < k2.key;
-        });
+    if (Bloom::find(_links_bloom_fltr, k.data, k.size)) {
+      // TODO zero allocation
+      Link tmp_link;
+      tmp_link.key = k;
+      auto [low, upper] = bin_search(
+          _links.begin(), _links.end(), tmp_link, [](const auto &k1, const auto &k2) {
+            return k1.key < k2.key;
+          });
 
-    for (auto it = low; it != upper; ++it) {
-      if (!it->empty() && k == it->key) {
-        return *it;
+      for (auto it = low; it != upper; ++it) {
+        if (!it->empty() && k == it->key) {
+          return *it;
+        }
       }
     }
   }
@@ -87,12 +90,18 @@ void MemLevel::sort() {
   _vals = std::move(vals);
 }
 
+void MemLevel::add_link(const Slice &k, const size_t pos, const size_t lvl) {
+  _links[_links_pos++] = Link{k, pos, lvl};
+  Bloom::add(_links_bloom_fltr, k.data, k.size);
+}
+
 LowLevel::LowLevel(size_t num, size_t B, size_t bloom_size)
     : _num(num)
     , _keys(B)
     , _vals(B)
     , _bloom_fltr(bloom_size)
     , _links(B)
+    , _links_bloom_fltr(B)
     , _cap(B)
     , _size(0) {}
 
@@ -109,6 +118,11 @@ bool LowLevel::insert(Slice &&k, Slice &&v) {
   rstore::inner::Bloom::add(_bloom_fltr, k.data, k.size);
   ++_size;
   return true;
+}
+
+void LowLevel::add_link(const Slice &k, const size_t pos, const size_t lvl) {
+  _links[_links_pos++] = Link{k, pos, lvl};
+  Bloom::add(_links_bloom_fltr, k.data, k.size);
 }
 
 Slice LowLevel::find(const Link &l) const {
@@ -131,17 +145,19 @@ std::variant<Slice, Link, bool> LowLevel::find(const Slice &k) const {
     }
   }
   if (_links_pos != 0) {
-    // TODO zero allocation
-    Link tmp_link;
-    tmp_link.key = k;
-    auto [low, upper] = bin_search(
-        _links.begin(), _links.end(), tmp_link, [](const auto &k1, const auto &k2) {
-          return k1.key < k2.key;
-        });
+    if (Bloom::find(_links_bloom_fltr, k.data, k.size)) {
+      // TODO zero allocation
+      Link tmp_link;
+      tmp_link.key = k;
+      auto [low, upper] = bin_search(
+          _links.begin(), _links.end(), tmp_link, [](const auto &k1, const auto &k2) {
+            return k1.key < k2.key;
+          });
 
-    for (auto it = low; it != upper; ++it) {
-      if (!it->empty() && k == it->key) {
-        return *it;
+      for (auto it = low; it != upper; ++it) {
+        if (!it->empty() && k == it->key) {
+          return *it;
+        }
       }
     }
   }

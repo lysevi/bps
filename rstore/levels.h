@@ -58,14 +58,14 @@ struct MemLevel final : public INode {
     for (auto &l : _links) {
       l = Link();
     }
+    std::fill(_links_bloom_fltr.begin(), _links_bloom_fltr.end(), false);
     _links_pos = 0;
   }
-  void add_link(const Slice &k, const size_t pos, const size_t lvl) override {
-    _links[_links_pos++] = Link{k, pos, lvl};
-  }
+  EXPORT void add_link(const Slice &k, const size_t pos, const size_t lvl) override;
   std::vector<Slice> _keys;
   std::vector<Slice> _vals;
   std::vector<Link> _links;
+  std::vector<bool> _links_bloom_fltr;
   const size_t _cap;
   size_t _size;
   size_t _links_pos = 0;
@@ -83,9 +83,7 @@ struct LowLevel final : public INode {
     return std::pair(&_keys.at(s), &_vals.at(s));
   }
 
-  void add_link(const Slice &k, const size_t pos, const size_t lvl) override {
-    _links[_links_pos++] = Link{k, pos, lvl};
-  }
+  EXPORT void add_link(const Slice &k, const size_t pos, const size_t lvl) override;
 
   void clear() override {
     for (size_t i = 0; i < _size; ++i) {
@@ -100,6 +98,7 @@ struct LowLevel final : public INode {
     for (auto &l : _links) {
       l = Link();
     }
+    std::fill(_links_bloom_fltr.begin(), _links_bloom_fltr.end(), false);
     _links_pos = 0;
   }
 
@@ -127,6 +126,7 @@ struct LowLevel final : public INode {
   std::vector<Slice> _vals;
   std::vector<bool> _bloom_fltr;
   std::vector<Link> _links;
+  std::vector<bool> _links_bloom_fltr;
   const size_t _cap;
   size_t _size;
   size_t _links_pos = 0;

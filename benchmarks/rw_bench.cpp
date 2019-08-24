@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     v += size_t(2);
     if (t.deep() != last_deel) {
       last_deel = t.deep();
-      std::cout << "deep: " << last_deel << std::endl;
+      std::cout << "level: " << last_deel << std::endl;
     }
   }
   size_t keys_count = static_cast<size_t>(k / 2.0);
