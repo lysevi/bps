@@ -21,13 +21,38 @@ std::pair<It, It> bin_search(It &&begin, It &&end, T &&k, BinaryPred &&pred) {
   }
   return std::pair(end, end);
 }
-
 } // namespace
+
+std::optional<Link> CascadeIndex::find(const Slice &k) const {
+  if (_links_pos != 0) {
+    if (Bloom::find(_links_bloom_fltr, k.data, k.size)) {
+      // TODO zero allocation
+      Link tmp_link;
+      tmp_link.key = k;
+      auto [low, upper] = bin_search(
+          _links.begin(), _links.end(), tmp_link, [](const auto &k1, const auto &k2) {
+            return k1.key < k2.key;
+          });
+
+      for (auto it = low; it != upper; ++it) {
+        if (!it->empty() && k == it->key) {
+          return *it;
+        }
+      }
+    }
+  }
+  return {};
+}
+
+void CascadeIndex::add_link(const Slice &k, const size_t pos, const size_t lvl) {
+  _links[_links_pos++] = Link{k, pos, lvl};
+  Bloom::add(_links_bloom_fltr, k.data, k.size);
+}
+
 MemLevel::MemLevel(size_t B)
     : _keys(B)
     , _vals(B)
-    , _links(B)
-    , _links_bloom_fltr(B)
+    , _index(B)
     , _cap(B)
     , _size(0) {}
 
@@ -47,25 +72,12 @@ std::variant<Slice, Link, bool> MemLevel::find(const Slice &k) const {
       return _vals[i];
     }
   }
-
-  if (_links_pos != 0) {
-    if (Bloom::find(_links_bloom_fltr, k.data, k.size)) {
-      // TODO zero allocation
-      Link tmp_link;
-      tmp_link.key = k;
-      auto [low, upper] = bin_search(
-          _links.begin(), _links.end(), tmp_link, [](const auto &k1, const auto &k2) {
-            return k1.key < k2.key;
-          });
-
-      for (auto it = low; it != upper; ++it) {
-        if (!it->empty() && k == it->key) {
-          return *it;
-        }
-      }
-    }
+  auto l = _index.find(k);
+  if (l.has_value()) {
+    return l.value();
+  } else {
+    return false;
   }
-  return false;
 }
 
 void MemLevel::sort() {
@@ -91,17 +103,15 @@ void MemLevel::sort() {
 }
 
 void MemLevel::add_link(const Slice &k, const size_t pos, const size_t lvl) {
-  _links[_links_pos++] = Link{k, pos, lvl};
-  Bloom::add(_links_bloom_fltr, k.data, k.size);
+  _index.add_link(k, pos, lvl);
 }
 
 LowLevel::LowLevel(size_t num, size_t B, size_t bloom_size)
     : _num(num)
     , _keys(B)
     , _vals(B)
+    , _index(B)
     , _bloom_fltr(bloom_size)
-    , _links(B)
-    , _links_bloom_fltr(B)
     , _cap(B)
     , _size(0) {}
 
@@ -121,8 +131,7 @@ bool LowLevel::insert(Slice &&k, Slice &&v) {
 }
 
 void LowLevel::add_link(const Slice &k, const size_t pos, const size_t lvl) {
-  _links[_links_pos++] = Link{k, pos, lvl};
-  Bloom::add(_links_bloom_fltr, k.data, k.size);
+  _index.add_link(k, pos, lvl);
 }
 
 Slice LowLevel::find(const Link &l) const {
@@ -144,24 +153,12 @@ std::variant<Slice, Link, bool> LowLevel::find(const Slice &k) const {
       }
     }
   }
-  if (_links_pos != 0) {
-    if (Bloom::find(_links_bloom_fltr, k.data, k.size)) {
-      // TODO zero allocation
-      Link tmp_link;
-      tmp_link.key = k;
-      auto [low, upper] = bin_search(
-          _links.begin(), _links.end(), tmp_link, [](const auto &k1, const auto &k2) {
-            return k1.key < k2.key;
-          });
-
-      for (auto it = low; it != upper; ++it) {
-        if (!it->empty() && k == it->key) {
-          return *it;
-        }
-      }
-    }
+  auto l = _index.find(k);
+  if (l.has_value()) {
+    return l.value();
+  } else {
+    return false;
   }
-  return false;
 }
 
 void kmerge(LowLevel *dest, std::vector<INode *> src) {

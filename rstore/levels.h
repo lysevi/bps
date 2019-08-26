@@ -7,6 +7,7 @@
 #include <rstore/utils/exception.h>
 
 #include <cstdint>
+#include <optional>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -21,6 +22,28 @@ struct Link {
   size_t lvl = UNKNOW_LVL; // TODO move to level header.
 
   bool empty() const { return key.empty() || pos == UNKNOW_POS || lvl == UNKNOW_LVL; }
+};
+
+struct CascadeIndex {
+  CascadeIndex(size_t B)
+      : _links(B)
+      , _links_bloom_fltr(B) {}
+
+  void clear_link() {
+    for (auto &l : _links) {
+      l = Link();
+    }
+    std::fill(_links_bloom_fltr.begin(), _links_bloom_fltr.end(), false);
+    _links_pos = 0;
+  }
+
+  void add_link(const Slice &k, const size_t pos, const size_t lvl);
+  std::optional<Link> find(const Slice &k) const;
+
+  bool empty() const { return _links_pos == 0; }
+  std::vector<Link> _links;
+  std::vector<bool> _links_bloom_fltr;
+  size_t _links_pos = 0;
 };
 
 struct INode {
@@ -54,21 +77,13 @@ struct MemLevel final : public INode {
     }
     _size = 0;
   }
-  void clear_link() override {
-    for (auto &l : _links) {
-      l = Link();
-    }
-    std::fill(_links_bloom_fltr.begin(), _links_bloom_fltr.end(), false);
-    _links_pos = 0;
-  }
+  void clear_link() override { _index.clear_link(); }
   EXPORT void add_link(const Slice &k, const size_t pos, const size_t lvl) override;
   std::vector<Slice> _keys;
   std::vector<Slice> _vals;
-  std::vector<Link> _links;
-  std::vector<bool> _links_bloom_fltr;
+  CascadeIndex _index;
   const size_t _cap;
   size_t _size;
-  size_t _links_pos = 0;
 };
 
 struct LowLevel final : public INode {
@@ -94,13 +109,7 @@ struct LowLevel final : public INode {
     _size = 0;
   }
 
-  void clear_link() override {
-    for (auto &l : _links) {
-      l = Link();
-    }
-    std::fill(_links_bloom_fltr.begin(), _links_bloom_fltr.end(), false);
-    _links_pos = 0;
-  }
+  void clear_link() override { _index.clear_link(); }
 
   std::pair<Slice *, Slice *> back() {
     if (_size == 0) {
@@ -118,18 +127,16 @@ struct LowLevel final : public INode {
     return pos;
   }
 
-  bool empty() const override { return _size == 0 && _links_pos == 0; }
+  bool empty() const override { return _size == 0 && _index.empty(); }
 
   void update_header();
   size_t _num = 0;
   std::vector<Slice> _keys;
   std::vector<Slice> _vals;
   std::vector<bool> _bloom_fltr;
-  std::vector<Link> _links;
-  std::vector<bool> _links_bloom_fltr;
+  CascadeIndex _index;
   const size_t _cap;
   size_t _size;
-  size_t _links_pos = 0;
 };
 
 EXPORT void kmerge(LowLevel *dest, std::vector<INode *> src);
