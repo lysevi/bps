@@ -46,10 +46,13 @@ struct CascadeIndex {
   size_t _links_pos = 0;
 };
 
+struct IKvStore {
+  virtual std::variant<Slice, Link, bool> find(const Slice &k) const = 0;
+  virtual bool insert(Slice &&k, Slice &&v) = 0;
+};
+
 struct ILevel {
   virtual ~ILevel() {}
-  virtual bool insert(Slice &&k, Slice &&v) = 0;
-  virtual std::variant<Slice, Link, bool> find(const Slice &k) const = 0;
   virtual size_t size() const = 0;
   virtual std::pair<Slice *, Slice *> at(size_t s) = 0;
   virtual bool empty() const = 0;
@@ -65,13 +68,15 @@ struct IOutLevel : public ILevel {
   virtual void update_header() = 0;
 };
 
-struct MemLevel final : public ILevel {
+struct MemLevel final : public ILevel, public IKvStore {
   EXPORT MemLevel(size_t B);
   EXPORT bool insert(Slice &&k, Slice &&v) override;
   EXPORT std::variant<Slice, Link, bool> find(const Slice &k) const override;
   EXPORT void sort();
 
-  size_t size() const override { return _size; }
+  size_t size() const override { 
+	  return _size; 
+  }
   std::pair<Slice *, Slice *> at(size_t s) override {
     return std::pair(&_keys.at(s), &_vals.at(s));
   }
@@ -93,12 +98,12 @@ struct MemLevel final : public ILevel {
   size_t _size;
 };
 
-struct LowLevel final : public IOutLevel {
+struct LowLevel final : public IOutLevel, public IKvStore {
 
   EXPORT LowLevel(size_t num, size_t B, size_t bloom_size);
   EXPORT bool insert(Slice &&k, Slice &&v) override;
-  EXPORT Slice find(const Link &l) const;
   EXPORT std::variant<Slice, Link, bool> find(const Slice &k) const override;
+  EXPORT Slice find(const Link &l) const;
 
   size_t size() const override { return _size; }
   std::pair<Slice *, Slice *> at(size_t s) override {
