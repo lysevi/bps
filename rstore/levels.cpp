@@ -110,8 +110,8 @@ LowLevel::LowLevel(size_t num, size_t B, size_t bloom_size)
     : _num(num)
     , _keys(B)
     , _vals(B)
-    , _index(B)
     , _bloom_fltr(bloom_size)
+    , _index(B)
     , _cap(B)
     , _size(0) {}
 
