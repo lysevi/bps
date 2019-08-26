@@ -46,8 +46,8 @@ struct CascadeIndex {
   size_t _links_pos = 0;
 };
 
-struct INode {
-  virtual ~INode() {}
+struct ILevel {
+  virtual ~ILevel() {}
   virtual bool insert(Slice &&k, Slice &&v) = 0;
   virtual std::variant<Slice, Link, bool> find(const Slice &k) const = 0;
   virtual size_t size() const = 0;
@@ -58,7 +58,14 @@ struct INode {
   virtual void add_link(const Slice &k, const size_t pos, const size_t lvl) = 0;
 };
 
-struct MemLevel final : public INode {
+struct IOutLevel : public ILevel {
+  virtual size_t push_back(std::pair<Slice *, Slice *> vals) = 0;
+  virtual std::pair<Slice *, Slice *> back() = 0;
+  virtual size_t num() const = 0;
+  virtual void update_header() = 0;
+};
+
+struct MemLevel final : public ILevel {
   EXPORT MemLevel(size_t B);
   EXPORT bool insert(Slice &&k, Slice &&v) override;
   EXPORT std::variant<Slice, Link, bool> find(const Slice &k) const override;
@@ -86,7 +93,7 @@ struct MemLevel final : public INode {
   size_t _size;
 };
 
-struct LowLevel final : public INode {
+struct LowLevel final : public IOutLevel {
 
   EXPORT LowLevel(size_t num, size_t B, size_t bloom_size);
   EXPORT bool insert(Slice &&k, Slice &&v) override;
@@ -111,7 +118,7 @@ struct LowLevel final : public INode {
 
   void clear_link() override { _index.clear_link(); }
 
-  std::pair<Slice *, Slice *> back() {
+  std::pair<Slice *, Slice *> back() override {
     if (_size == 0) {
       return std::pair<Slice *, Slice *>(nullptr, nullptr);
     } else {
@@ -119,7 +126,7 @@ struct LowLevel final : public INode {
     }
   }
 
-  size_t push_back(std::pair<Slice *, Slice *> vals) {
+  size_t push_back(std::pair<Slice *, Slice *> vals) override {
     auto pos = _size;
     _keys[_size] = *vals.first;
     _vals[_size] = *vals.second;
@@ -128,8 +135,9 @@ struct LowLevel final : public INode {
   }
 
   bool empty() const override { return _size == 0 && _index.empty(); }
+  size_t num() const override { return _num; }
+  void update_header() override;
 
-  void update_header();
   size_t _num = 0;
   std::vector<Slice> _keys;
   std::vector<Slice> _vals;
@@ -139,5 +147,5 @@ struct LowLevel final : public INode {
   size_t _size;
 };
 
-EXPORT void kmerge(LowLevel *dest, std::vector<INode *> src);
+EXPORT void kmerge(IOutLevel *dest, std::vector<ILevel *> src);
 }; // namespace rstore::inner

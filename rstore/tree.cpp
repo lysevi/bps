@@ -41,7 +41,7 @@ void Tree::insert(Slice &&k, Slice &&v) {
 
     auto merge_target = _levels[out_lvl];
     _memory_level->clear_link();
-    std::vector<inner::INode *> to_merge(out_lvl + 1);
+    std::vector<inner::ILevel *> to_merge(out_lvl + 1);
     to_merge[0] = _memory_level.get();
     for (size_t i = 0; i < out_lvl; ++i) {
       auto ptr = _levels[i].get();

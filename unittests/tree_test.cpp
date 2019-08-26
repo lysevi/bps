@@ -61,7 +61,7 @@ TEST_CASE("tree.memlevel", "[store]") {
 
 TEST_CASE("tree.kmerge", "[store]") {
   size_t count = 3;
-  std::vector<rstore::inner::INode *> src;
+  std::vector<rstore::inner::ILevel *> src;
   src.reserve(count * 2);
   size_t k = 0;
   size_t num = 0;
@@ -82,7 +82,7 @@ TEST_CASE("tree.kmerge", "[store]") {
   }
 
   auto total_size = std::accumulate(
-      src.cbegin(), src.cend(), size_t(0), [](size_t r, const rstore::inner::INode *n) {
+      src.cbegin(), src.cend(), size_t(0), [](size_t r, const rstore::inner::ILevel *n) {
         return r + n->size();
       });
 

@@ -161,7 +161,7 @@ std::variant<Slice, Link, bool> LowLevel::find(const Slice &k) const {
   }
 }
 
-void kmerge(LowLevel *dest, std::vector<INode *> src) {
+void kmerge(IOutLevel *dest, std::vector<ILevel *> src) {
   auto vals_size = src.size();
   std::list<size_t> poses;
   for (size_t i = 0; i < vals_size; ++i) {
@@ -186,7 +186,7 @@ void kmerge(LowLevel *dest, std::vector<INode *> src) {
     auto val = (*with_max_index_it)->at(*with_max_index);
     if (dest->size() == 0 || dest->back() != val) {
       auto pos = dest->push_back(val);
-      (*with_max_index_it)->add_link(*val.first, pos, dest->_num);
+      (*with_max_index_it)->add_link(*val.first, pos, dest->num());
     }
     // remove ended in-list
     (*with_max_index)++;
