@@ -7,6 +7,7 @@
 #include <rstore/utils/exception.h>
 
 #include <cstdint>
+#include <optional>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -23,10 +24,35 @@ struct Link {
   bool empty() const { return key.empty() || pos == UNKNOW_POS || lvl == UNKNOW_LVL; }
 };
 
-struct INode {
-  virtual ~INode() {}
-  virtual bool insert(Slice &&k, Slice &&v) = 0;
+struct CascadeIndex {
+  CascadeIndex(size_t B)
+      : _links(B)
+      , _links_bloom_fltr(B) {}
+
+  void clear_link() {
+    for (auto &l : _links) {
+      l = Link();
+    }
+    std::fill(_links_bloom_fltr.begin(), _links_bloom_fltr.end(), false);
+    _links_pos = 0;
+  }
+
+  void add_link(const Slice &k, const size_t pos, const size_t lvl);
+  std::optional<Link> find(const Slice &k) const;
+
+  bool empty() const { return _links_pos == 0; }
+  std::vector<Link> _links;
+  std::vector<bool> _links_bloom_fltr;
+  size_t _links_pos = 0;
+};
+
+struct IKvStore {
   virtual std::variant<Slice, Link, bool> find(const Slice &k) const = 0;
+  virtual bool insert(Slice &&k, Slice &&v) = 0;
+};
+
+struct ILevel {
+  virtual ~ILevel() {}
   virtual size_t size() const = 0;
   virtual std::pair<Slice *, Slice *> at(size_t s) = 0;
   virtual bool empty() const = 0;
@@ -35,13 +61,22 @@ struct INode {
   virtual void add_link(const Slice &k, const size_t pos, const size_t lvl) = 0;
 };
 
-struct MemLevel final : public INode {
+struct IOutLevel : public ILevel {
+  virtual size_t push_back(std::pair<Slice *, Slice *> vals) = 0;
+  virtual std::pair<Slice *, Slice *> back() = 0;
+  virtual size_t num() const = 0;
+  virtual void update_header() = 0;
+};
+
+struct MemLevel final : public ILevel, public IKvStore {
   EXPORT MemLevel(size_t B);
   EXPORT bool insert(Slice &&k, Slice &&v) override;
   EXPORT std::variant<Slice, Link, bool> find(const Slice &k) const override;
   EXPORT void sort();
 
-  size_t size() const override { return _size; }
+  size_t size() const override { 
+	  return _size; 
+  }
   std::pair<Slice *, Slice *> at(size_t s) override {
     return std::pair(&_keys.at(s), &_vals.at(s));
   }
@@ -54,38 +89,28 @@ struct MemLevel final : public INode {
     }
     _size = 0;
   }
-  void clear_link() override {
-    for (auto &l : _links) {
-      l = Link();
-    }
-    _links_pos = 0;
-  }
-  void add_link(const Slice &k, const size_t pos, const size_t lvl) override {
-    _links[_links_pos++] = Link{k, pos, lvl};
-  }
+  void clear_link() override { _index.clear_link(); }
+  EXPORT void add_link(const Slice &k, const size_t pos, const size_t lvl) override;
   std::vector<Slice> _keys;
   std::vector<Slice> _vals;
-  std::vector<Link> _links;
+  CascadeIndex _index;
   const size_t _cap;
   size_t _size;
-  size_t _links_pos = 0;
 };
 
-struct LowLevel final : public INode {
+struct LowLevel final : public IOutLevel, public IKvStore {
 
   EXPORT LowLevel(size_t num, size_t B, size_t bloom_size);
   EXPORT bool insert(Slice &&k, Slice &&v) override;
-  EXPORT Slice find(const Link &l) const;
   EXPORT std::variant<Slice, Link, bool> find(const Slice &k) const override;
+  EXPORT Slice find(const Link &l) const;
 
   size_t size() const override { return _size; }
   std::pair<Slice *, Slice *> at(size_t s) override {
     return std::pair(&_keys.at(s), &_vals.at(s));
   }
 
-  void add_link(const Slice &k, const size_t pos, const size_t lvl) override {
-    _links[_links_pos++] = Link{k, pos, lvl};
-  }
+  EXPORT void add_link(const Slice &k, const size_t pos, const size_t lvl) override;
 
   void clear() override {
     for (size_t i = 0; i < _size; ++i) {
@@ -96,14 +121,9 @@ struct LowLevel final : public INode {
     _size = 0;
   }
 
-  void clear_link() override {
-    for (auto &l : _links) {
-      l = Link();
-    }
-    _links_pos = 0;
-  }
+  void clear_link() override { _index.clear_link(); }
 
-  std::pair<Slice *, Slice *> back() {
+  std::pair<Slice *, Slice *> back() override {
     if (_size == 0) {
       return std::pair<Slice *, Slice *>(nullptr, nullptr);
     } else {
@@ -111,7 +131,7 @@ struct LowLevel final : public INode {
     }
   }
 
-  size_t push_back(std::pair<Slice *, Slice *> vals) {
+  size_t push_back(std::pair<Slice *, Slice *> vals) override {
     auto pos = _size;
     _keys[_size] = *vals.first;
     _vals[_size] = *vals.second;
@@ -119,18 +139,18 @@ struct LowLevel final : public INode {
     return pos;
   }
 
-  bool empty() const override { return _size == 0 && _links_pos == 0; }
+  bool empty() const override { return _size == 0 && _index.empty(); }
+  size_t num() const override { return _num; }
+  void update_header() override;
 
-  void update_header();
   size_t _num = 0;
   std::vector<Slice> _keys;
   std::vector<Slice> _vals;
   std::vector<bool> _bloom_fltr;
-  std::vector<Link> _links;
+  CascadeIndex _index;
   const size_t _cap;
   size_t _size;
-  size_t _links_pos = 0;
 };
 
-EXPORT void kmerge(LowLevel *dest, std::vector<INode *> src);
+EXPORT void kmerge(IOutLevel *dest, std::vector<ILevel *> src);
 }; // namespace rstore::inner
